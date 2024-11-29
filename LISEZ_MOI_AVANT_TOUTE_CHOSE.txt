@@ -1,0 +1,32 @@
+#### Utilisation de ce modèle de rapport LaTeX ####
+
+## Linux ##
+
+Sous Linux, il vous faut installer une distribution LaTeX ainsi qu'un éditeur de texte dédié.
+
+Sous debian/ubuntu/mint, la ligne de commande qui suit installe ce qu'il faut :
+
+sudo apt-get install texlive texlive-base texlive-base-bin texlive-common texlive-context texlive-doc-base texlive-doc-en texlive-doc-fr texlive-fonts-extra texlive-fonts-recommended texlive-generic-recommended texlive-lang-french texlive-lang-greek texlive-latex-base texlive-latex-extra texlive-latex-recommended texlive-math-extra texlive-pictures texlive-pstricks cm-super texlive-science texmaker
+
+Vous pourrez alors utiliser Texmaker comme éditeur dédié et éventuellement utiliser ses outils de compilation. Dans l'ordre, la production du rapport au format PDF nécessite dans le cas le plus général la séquence suivante : pdflatex, pdflatex, bibtex, pdflatex, pdflatex.
+
+Vous pouvez aussi compiler en ligne de commande en lançant "make" depuis le dossier contenant le fichier "rapport.tex".
+
+## Windows ##
+
+Sous Windows, il vous faut là encore installer une distribution LaTeX ainsi qu'un éditeur de texte dédié.
+
+Je vous conseille la distribution MikTex (http://www.miktex.org/).
+
+Concernant l'éditeur, Texmaker est aussi disponible pour Windows (http://www.xm1math.net/texmaker/download.html#windows). Dans l'ordre, la production du rapport au format PDF nécessite dans le cas le plus général la séquence suivante : pdflatex, pdflatex, bibtex, pdflatex, pdflatex.
+
+## Mac Os (Intel) ##
+
+Sou Mac, il vous faut là encore installer une distribution LaTex ainsi qu'un éditeur de texte dédié.
+
+Je vous conseille la distribution MacTeX (http://www.tug.org/mactex/).
+
+Concernant l'éditeur, Texmaker est aussi disponible pour Mac (processeurs Intel seulement (http://www.xm1math.net/texmaker/download.html#macosx). Dans l'ordre, la production du rapport au format PDF nécessite dans le cas le plus général la séquence suivante : pdflatex, pdflatex, bibtex, pdflatex, pdflatex.
+
+
+
