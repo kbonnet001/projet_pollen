@@ -10,12 +10,17 @@ from urdf_tools import reduce_model_pin_arm
 
 import matplotlib.pyplot as plt
 
+import time
+
 # ----------------------------------------------------------
 
-def symbolic_inverse_kinematics_continuous_for_test(urdf_filename, prefix, current_joints, goal_pose, matrix_rot, debug=True, plot=False):
+def symbolic_inverse_kinematics_continuous_for_test(urdf_filename, prefix, current_joints, goal_pose, matrix_rot, debug=False, plot=False):
 
     if debug : 
         print("--------------\nsymbolic_inverse_kinematics_continuous_for_test\n--------------")
+    
+    # Début timer
+    start_time = time.time()
 
     # model pin de l'urdf réduit (1 bras)
     model = reduce_model_pin_arm(urdf_filename, prefix)
@@ -39,9 +44,10 @@ def symbolic_inverse_kinematics_continuous_for_test(urdf_filename, prefix, curre
             print(f"Joint {i}: Transformation\n{oMi}")
 
     # Paramètres
-    eps = 1e-4
-    IT_MAX = 50000 # original 1000
-    DT = 1e-3 # original e-1
+    eps_pos = 1e-2 # ordre du milimetre
+    eps_or = 1e-2 # 0.01 rad 
+    IT_MAX = 1000 # original 1000
+    DT = 1e-2 # original e-1
     damp = 1e-6 # original e-12
 
     if plot : 
@@ -58,7 +64,7 @@ def symbolic_inverse_kinematics_continuous_for_test(urdf_filename, prefix, curre
         # computing an error in SO(3) as a six-dimensional vector.
         err = pin.log(iMd).vector  
 
-        if norm(err) < eps: # cas où ça converge :)
+        if norm(err[0:3]) < eps_pos and norm(err[3:]) < eps_or : # cas où ça converge :)
             success = True
             break
         if i >= IT_MAX: # on atteint la limite de boucle :(
@@ -80,13 +86,16 @@ def symbolic_inverse_kinematics_continuous_for_test(urdf_filename, prefix, curre
 
         # A ajuster, peut être inutile
         # Affiner la recherche, réduire le pas DT        
-        if not i % 1000 and (i==10000):
-            DT=DT*1e-1
+        # if not i % 1000 and (i==10000):
+        #     DT=DT*1e-1
 
-            if debug : 
-                print("DT = ", DT)
+        #     if debug : 
+        #         print("DT = ", DT)
 
         i += 1
+
+    # Fin du chronométrage
+    elapsed_time = time.time() - start_time
 
     if debug : 
         print("----------\nq_f = ", q.tolist() )
@@ -126,5 +135,5 @@ def symbolic_inverse_kinematics_continuous_for_test(urdf_filename, prefix, curre
         plt.grid()
         plt.show()
 
+    print(f"Total time to converge: {elapsed_time:.2f} seconds")
     return q.tolist()
-
