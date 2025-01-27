@@ -27,15 +27,6 @@ i = 0
 while True:
     pinocchio.forwardKinematics(model, data, q)
     iMd = data.oMi[JOINT_ID].actInv(oMdes)
-    
-    # oMdes
-    # SE3(array([[1., 0., 0., 1.],[0., 1., 0., 0.],[0., 0., 1., 1.],[0., 0., 0., 1.]]))
-
-    # iMd
-    # SE3(array([[ 1.,  0.,  0.,  1.],[ 0.,  1.,  0.,  0.],[ 0.,  0.,  1., -1.],[ 0.,  0.,  0.,  1.]]))
-
-    # data.oMi[JOINT_ID]
-    # SE3(array([[1., 0., 0., 0.],[0., 1., 0., 0.],[0., 0., 1., 2.],[0., 0., 0., 1.]]))
 
     err = pinocchio.log(iMd).vector  # in joint frame
     if norm(err) < eps:
