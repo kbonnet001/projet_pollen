@@ -4,18 +4,24 @@
 
 ## ⁉️ Specifications
 
-Describe the **context** and the **need** that forced your client to submit this project to you.
+[Pollen](https://www.pollen-robotics.com/), a start-up located in Bordeaux, develops [Reachy](https://github.com/pollen-robotics), an anthropomorphic robot primarily used for immersive teleoperation applications. In these applications, enhancing the user's sense of control is essential but must not come at the expense of safety. It is therefore crucial to ensure the optimal execution of commands while respecting both the robot's intrinsic and extrinsic constraints. Furthermore, continuously providing feedback on the robot's capabilities can contribute to this sense of control by reducing the gap between the commanded action and the one actually performed.  
 
-Describe what is the **input** of your project, such as existing software or hardware you will rely on, and their maturity if they are ongoing work.
+The objective of the project is to explore alternatives to the inverse kinematics approach implemented by Pollen within the Reachy robot architecture, particularly in the context of teleoperation.
 
-Describe what is the **expected output** of your project. Make sure that your contribution to this project is explicit.
+### Input
+We rely on Reachy2’s existing hardware and software, including its analytical inverse kinematics solver. While an implementation for handling joint limits exists, it lacks robustness and needs improvement.
+
+### Output
+Our goal is to enhance motion control strategies to ensure smooth and reliable teleoperation, even near singularities and joint limits. This will involve refining existing solutions and developing new approaches to improve accuracy and responsiveness.
 
 ## 🔎 Implemented approch
 
-Describe your **approach** and how you proceeded to solve the problems reported by the client
- the work to solve this problem.
+To address this challenge, we conducted a [state-of-the-art review](docs/bibliography/etat_de_l_art.pdf) to explore alternative inverse kinematics approaches within Reachy2’s architecture. Based on this, we defined the following action plan:
 
-Add links to relevant sections to your user documentation and developer documentation but do not duplicate information.
+* Implement inverse kinematics resolution using the Jacobian and the [Pinocchio library](https://github.com/stack-of-tasks/pinocchio).
+* Solve inverse kinematics using a Quadratic Programming (QP) approach with the [Pink library](https://github.com/stephane-caron/pink).
+* Introduce constraints and experiment with different combinations.
+* Perform tests to compare methods, analyze results, and provide critical insights.
 
 ## 📈 Analysis of results
 
