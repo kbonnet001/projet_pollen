@@ -5,7 +5,7 @@ import os
 import numpy as np
 sys.path.append('/home/reachy/dev/reachy2_symbolic_ik/src/reachy2_symbolic_ik/')
 
-def plot_metrics_for_pink_sphere(path, filename, method, d_min):
+def plot_metrics_for_pink_sphere(path, df, method, d_min):
     """
     Plots the evolution of the distance between two pink spheres.
     
@@ -15,8 +15,6 @@ def plot_metrics_for_pink_sphere(path, filename, method, d_min):
         method (str): Method identifier for saving the plot.
         d_min (float): Minimum distance threshold to be plotted as a horizontal line.
     """
-    # Load data from CSV
-    df = pd.read_csv(os.path.join(path, filename))
 
     # Convert columns to numpy arrays for plotting
     iterations = df["Iteration"].to_numpy()
@@ -37,7 +35,7 @@ def plot_metrics_for_pink_sphere(path, filename, method, d_min):
     plt.savefig(f"{path}/{method}_plot_distance_sphere.png", dpi=300)
     plt.show()
 
-def plot_q(path, filename, method):
+def plot_q(path, df, method):
     """
     Plots the deviation of the q values for the left and right arms using subplots,
     with the primary Y-axis in radians (fractions of π) and a secondary Y-axis in degrees.
@@ -47,8 +45,6 @@ def plot_q(path, filename, method):
         filename (str): Name of the CSV file containing the metrics.
         method (str): Method identifier for saving the plot.
     """
-    # Load data from CSV
-    df = pd.read_csv(os.path.join(path, filename))
 
     # Create subplots for left and right arm deviations
     fig, axes = plt.subplots(2, 1, figsize=(8, 6), sharex=True)
@@ -88,11 +84,125 @@ def plot_q(path, filename, method):
     axes[1].set_xlabel("Iteration")
     axes[1].legend()
 
+    plt.title("Variation of joint angle q for each pose")
     plt.tight_layout()
     plt.savefig(f"{path}/{method}_plot_q.png", dpi=300)
     plt.show()
 
-def plot_ecart_q(path, filename, method, tolerance):
+def plot_velocity(path, df, method):
+    """
+    Plots the deviation of the q values for the left and right arms using subplots,
+    with the primary Y-axis in radians (fractions of π) and a secondary Y-axis in degrees.
+    
+    Parameters:
+        path (str): Directory containing the CSV file.
+        filename (str): Name of the CSV file containing the metrics.
+        method (str): Method identifier for saving the plot.
+    """
+
+    # Create subplots for left and right arm deviations
+    fig, axes = plt.subplots(2, 1, figsize=(8, 6), sharex=True)
+    iterations = df["Iteration"].to_numpy()
+
+    # Get the column names for left and right arm deviations
+    ecart_l_cols = [col for col in df.columns if col.startswith("velocity_l")]
+    ecart_r_cols = [col for col in df.columns if col.startswith("velocity_r")]
+
+    # Definition of ticks in rad
+    radian_ticks = np.array([-np.pi/2, -np.pi/4, 0, np.pi/4, np.pi/2])
+    radian_labels = [r"$-\frac{\pi}{2}$", r"$-\frac{\pi}{4}$", "0", 
+                     r"$\frac{\pi}{4}$", r"$\frac{\pi}{2}$"]
+
+    def add_secondary_y_axis(ax):
+        ax2 = ax.twinx()
+        ax2.set_ylabel("Degrees/s", color='black')
+        ax2.set_ylim(np.degrees(ax.get_ylim()[0]), np.degrees(ax.get_ylim()[1]))
+        return ax2
+
+    # Plot left arm deviations (radians primary, degrees secondary)
+    for col in ecart_l_cols:
+        axes[0].plot(iterations, df[col].to_numpy(), marker="o", label=col)
+    axes[0].set_ylabel("Left Arm q (rad/s)")
+    axes[0].set_yticks(radian_ticks)
+    axes[0].set_yticklabels(radian_labels)
+    add_secondary_y_axis(axes[0])
+    axes[0].legend()
+
+    # Plot right arm deviations (radians primary, degrees secondary)
+    for col in ecart_r_cols:
+        axes[1].plot(iterations, df[col].to_numpy(), marker="o", label=col)
+    axes[1].set_ylabel("Right Arm q (rad/s)")
+    axes[1].set_yticks(radian_ticks)
+    axes[1].set_yticklabels(radian_labels)
+    add_secondary_y_axis(axes[1])
+    axes[1].set_xlabel("Iteration")
+    axes[1].legend()
+
+    plt.title("Variation of velocity for each pose")
+    plt.tight_layout()
+    plt.savefig(f"{path}/{method}_plot_velocity.png", dpi=300)
+    plt.show()
+
+
+def plot_velocity_std(path, df, method):
+    """
+    Plots the rolling standard deviation of the velocity values for the left and right arms using subplots.
+    The primary Y-axis is in radians per second, with a secondary Y-axis in degrees per second.
+    
+    Parameters:
+        path (str): Directory to save the plot.
+        df (pd.DataFrame): Dataframe containing the velocity data.
+        method (str): Method identifier for saving the plot.
+    """
+
+    # Create subplots for left and right arm deviations
+    fig, axes = plt.subplots(2, 1, figsize=(8, 6), sharex=True)
+    iterations = df["Iteration"].to_numpy()
+
+    # Get the column names for left and right arm velocity
+    velocity_l_cols = [col for col in df.columns if col.startswith("velocity_l")]
+    velocity_r_cols = [col for col in df.columns if col.startswith("velocity_r")]
+
+    # Compute rolling standard deviation with a window of 10
+    df_std = df.copy()
+    for col in velocity_l_cols + velocity_r_cols:
+        df_std[col] = df[col].rolling(window=10, min_periods=1).std()
+
+    # Definition of ticks in rad/s
+    radian_ticks = np.array([0, np.pi/12, np.pi/6, np.pi/4])
+    radian_labels = ["0", r"$\frac{\pi}{12}$", r"$\frac{\pi}{6}$", r"$\frac{\pi}{4}$"]
+
+    def add_secondary_y_axis(ax):
+        ax2 = ax.twinx()
+        ax2.set_ylabel("Degrees/s", color='black')
+        ax2.set_ylim(np.degrees(ax.get_ylim()[0]), np.degrees(ax.get_ylim()[1]))
+        return ax2
+
+    # Plot left arm standard deviation
+    for col in velocity_l_cols:
+        axes[0].plot(iterations, df_std[col].to_numpy(), marker="o", label=col)
+    axes[0].set_ylabel("Left Arm std q (rad/s)")
+    axes[0].set_yticks(radian_ticks)
+    axes[0].set_yticklabels(radian_labels)
+    add_secondary_y_axis(axes[0])
+    axes[0].legend()
+
+    # Plot right arm standard deviation
+    for col in velocity_r_cols:
+        axes[1].plot(iterations, df_std[col].to_numpy(), marker="o", label=col)
+    axes[1].set_ylabel("Right Arm std q (rad/s)")
+    axes[1].set_yticks(radian_ticks)
+    axes[1].set_yticklabels(radian_labels)
+    add_secondary_y_axis(axes[1])
+    axes[1].set_xlabel("Iteration")
+    axes[1].legend()
+
+    plt.suptitle("Rolling Standard Deviation of Velocity (Window = 10)")
+    plt.tight_layout()
+    plt.savefig(f"{path}/{method}_plot_velocity_std.png", dpi=300)
+    plt.show()
+
+def plot_ecart_q(path, df, method, tolerance):
     """
     Plots the deviation (écart) of the q values for the left and right arms using subplots.
     
@@ -100,8 +210,6 @@ def plot_ecart_q(path, filename, method, tolerance):
         filename (str): Path to the CSV file containing the metrics.
         tolerance (float): The tolerance threshold to be plotted as a horizontal line.
     """
-    # Load data from CSV
-    df = pd.read_csv(os.path.join(path, filename))
 
     # Create subplots for left and right arm deviations
     fig, axes = plt.subplots(2, 1, figsize=(8, 6), sharex=True)
@@ -141,156 +249,116 @@ def plot_ecart_q(path, filename, method, tolerance):
     add_secondary_y_axis(axes[1])
     axes[1].set_xlabel("Iteration")
     axes[1].legend()
-    
+
+    plt.title("Variation of ecart q for each pose")
     plt.tight_layout()
     plt.savefig(f"{path}/{method}_plot_ecarts_q.png", dpi=300)
     plt.show()
 
-
-def plot_ecart_pos(path, filename, method):
+def plot_ecart_pos_rot(path, df, method):
     """
-    Plots the positional error (écart position) for both left and right arms.
+    Plots the positional and rotational error side by side in a single figure.
     
     Parameters:
-        filename (str): Path to the CSV file containing the metrics.
-    """
-    # Load data from CSV
-    df = pd.read_csv(os.path.join(path, filename))
-
-    # Create the plot
-    plt.figure(figsize=(8, 5))
-
-    # Convert columns to numpy arrays
-    iterations = df["Iteration"].to_numpy()
-
-    # if method == "pink_sphere" : 
-    ecart_l = df["Ecart_pos_l"].to_numpy()
-    ecart_r = df["Ecart_pos_r"].to_numpy()
-
-    plt.plot(iterations, ecart_l, marker="o", label="Left Pos Error")
-    plt.plot(iterations, ecart_r, marker="o", label="Right Pos Error")
-
-    # Add labels, title and legend
-    plt.xlabel("Iteration")
-    plt.ylabel("Position Error (m)")
-    plt.title("Positional Error of each Pose")
-    plt.legend()
-
-    # Save and display the plot
-    plt.savefig(f"{path}/{method}_plot_ecart_pos.png", dpi=300)
-    plt.show()
-
-
-def plot_ecart_rot(path, filename, method):
-    """
-    Plots the rotational error (écart rotation) for both left and right arms, 
-    with the primary Y-axis in radians and a secondary Y-axis in degrees.
-    
-    Parameters:
-        path (str): Path to the directory containing the file.
-        filename (str): CSV file containing the metrics.
+        path (str): Path to save the plot.
+        df (DataFrame): Data containing the errors.
         method (str): Method name for saving the plot.
     """
-    # Load data from CSV
-    df = pd.read_csv(os.path.join(path, filename))
-
-    # Create the figure and primary Y-axis (radians)
-    fig, ax1 = plt.subplots(figsize=(8, 5))
-
-    # Convert columns to numpy arrays
+    # Create figure with two subplots
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+    
     iterations = df["Iteration"].to_numpy()
-    ecart_l = df["Ecart_rot_l"].to_numpy()
-    ecart_r = df["Ecart_rot_r"].to_numpy()
-
-    # Convert degrees to radians
-    ecart_l_rad = np.radians(ecart_l)
-    ecart_r_rad = np.radians(ecart_r)
-
-    # Plot data in radians
-    ax1.plot(iterations, ecart_l_rad, marker="o", label="Left Rot Error (rad)")
-    ax1.plot(iterations, ecart_r_rad, marker="o", label="Right Rot Error (rad)")
-
-    # Labels and title
+    
+    # Positional error plot (Left)
+    ecart_l_pos = df["Ecart_pos_l"].to_numpy()
+    ecart_r_pos = df["Ecart_pos_r"].to_numpy()
+    
+    axes[0].plot(iterations, ecart_l_pos, marker="o", label="Left Pos Error")
+    axes[0].plot(iterations, ecart_r_pos, marker="o", label="Right Pos Error")
+    axes[0].set_xlabel("Iteration")
+    axes[0].set_ylabel("Position Error (m)")
+    axes[0].set_title("Positional Error")
+    axes[0].legend()
+    
+    # Rotational error plot (Right)
+    ecart_l_rot = np.radians(df["Ecart_rot_l"].to_numpy())
+    ecart_r_rot = np.radians(df["Ecart_rot_r"].to_numpy())
+    
+    ax1 = axes[1]
+    ax2 = ax1.twinx()
+    
+    ax1.plot(iterations, ecart_l_rot, marker="o", label="Left Rot Error (rad)")
+    ax1.plot(iterations, ecart_r_rot, marker="o", label="Right Rot Error (rad)")
     ax1.set_xlabel("Iteration")
     ax1.set_ylabel("Rotational Error (radians)", color='black')
-    ax1.set_title("Rotational Error of each Pose")
+    ax1.set_title("Rotational Error")
     
     # Set Y-ticks in fractions of π
     radian_ticks = np.array([0, 15, 30])  # Degrees
     radian_labels = ["0", r"$\frac{\pi}{12}$", r"$\frac{\pi}{6}$"]
     ax1.set_yticks(np.radians(radian_ticks))
     ax1.set_yticklabels(radian_labels)
-
+    
     # Secondary Y-axis for degrees
-    ax2 = ax1.twinx()
     ax2.set_ylabel("Rotational Error (deg)", color='black')
     ax2.set_ylim(ax1.get_ylim())  # Ensure same range
-
-    # Set Y-ticks for degrees
     ax2.set_yticks(np.radians(radian_ticks))
     ax2.set_yticklabels(radian_ticks)
-
-    # Legends
+    
     ax1.legend(loc="upper left")
-
-    # Save and show plot
-    plt.savefig(f"{path}/{method}_plot_ecart_rot_q.png", dpi=300)
+    
+    # Adjust layout and save the plot
+    plt.tight_layout()
+    plt.savefig(f"{path}/{method}_plot_ecart_pos_rot.png", dpi=300)
     plt.show()
 
-
-def plot_translations(path, filename, method):
+def plot_translations_and_draw(path, df, method, plot_goal=True, plot_pollen=True, df_pollen=None):
     """
-    Plots the deviation (écart) of the q values for the left and right arms using subplots.
+    Combines translation plots (x, y, z) on the left and a movement draw on the right.
+    """
+    fig, axes = plt.subplots(3, 2, figsize=(10, 6), sharex='col', 
+                             gridspec_kw={'width_ratios': [1, 1], 'height_ratios': [1, 1, 1]})
     
-    Parameters:
-        filename (str): Path to the CSV file containing the metrics.
-        tolerance (float): The tolerance threshold to be plotted as a horizontal line.
-    """
-    # Load data from CSV
-    df = pd.read_csv(os.path.join(path, filename))
-
-    # Create subplots for left and right arm deviations
-    fig, axes = plt.subplots(3, 1, figsize=(8, 6), sharex=True)
     iterations = df["Iteration"].to_numpy()
-
-    # Get the column names for left and right arm deviations
-
     label_pos = ["x", "y", "z"]
     colors = ["r", "g", "b"]
-
-    for i in range(3):
-        axes[i].plot(iterations, df[f'translation_l_{i}'].to_numpy(), marker="o", label=label_pos[i], color=colors[i])
-        axes[i].set_ylabel(f"Position {label_pos[i]} (m)")
-        axes[i].legend()
-
-    plt.title("Evolution of position for each pose")
-    plt.tight_layout()
-    plt.savefig(f"{path}/{method}_plot_translation.png", dpi=300)
-    plt.show()
-
-def plot_draw(path, filename, method, color="b"):
-    """
-    Plots the rotational error (écart rotation) for both left and right arms.
     
-    Parameters:
-        filename (str): Path to the CSV file containing the metrics.
-    """
+    # Left side: Translation plots
+    for i in range(3):
+        axes[i, 0].plot(iterations, df[f'translation_l_{i}'].to_numpy(), marker="o", markersize=2, label=f"{label_pos[i]}_{method}", color=colors[i])
+        if plot_goal:
+            axes[i, 0].plot(iterations, df[f'translation_goal_l_{i}'].to_numpy(), linestyle="--", marker="o", markersize=2, alpha=0.5, label=f"{label_pos[i]}_goal")
+        if plot_pollen and method != "pollen" and isinstance(df_pollen, pd.DataFrame):
+            axes[i, 0].plot(iterations, df_pollen[f'translation_l_{i}'].to_numpy(), linestyle="--", marker="o", markersize=2, alpha=0.5, label=f"{label_pos[i]}_pollen")
+        
+        axes[i, 0].set_ylabel(f"Position {label_pos[i]} (m)")
+        axes[i, 0].legend()
 
-    # Load data from CSV
-    df = pd.read_csv(os.path.join(path, filename))
-
-    # Plot y et z
-    plt.plot(df['translation_l_1'].to_numpy(), df['translation_l_2'].to_numpy(), marker="o", markersize = "2", label = "l_arm")
-    plt.plot(df['translation_r_1'].to_numpy(), df['translation_r_2'].to_numpy(), marker="o", markersize = "2", label = "r_arm")
-
-    plt.xlabel('Position y (m)')
-    plt.ylabel('Position z (m)')
-    plt.title('Draw of mouvement in torso frame')
-    plt.legend()
-
-    # Save and display the plot
-    plt.savefig(f"{path}/{method}_plot_draw.png", dpi=300)
+    fig.text(0.25, 0.95, "Evolution of position for each pose (l_arm)", fontsize=12, ha='center')
+    
+    # Right side: Draw (spanning all rows)
+    ax_draw = fig.add_subplot(1, 2, 2)
+    ax_draw.plot(df['translation_l_1'].to_numpy(), df['translation_l_2'].to_numpy(), marker="o", markersize=2, label=f"l_arm_{method}")
+    ax_draw.plot(df['translation_r_1'].to_numpy(), df['translation_r_2'].to_numpy(), marker="o", markersize=2, label=f"r_arm_{method}")
+    
+    if plot_goal:
+        ax_draw.plot(df['translation_goal_l_1'].to_numpy(), df['translation_goal_l_2'].to_numpy(), linestyle="--", marker="o", alpha=0.5, markersize=2, label="l_arm_goal")
+        ax_draw.plot(df['translation_goal_r_1'].to_numpy(), df['translation_goal_r_2'].to_numpy(), linestyle="--", marker="o", alpha=0.5, markersize=2, label="r_arm_goal")
+    
+    if plot_pollen and method != "pollen" and isinstance(df_pollen, pd.DataFrame):
+        ax_draw.plot(df_pollen['translation_l_1'].to_numpy(), df_pollen['translation_l_2'].to_numpy(), linestyle="--", marker="o", alpha=0.5, markersize=2, label="l_arm_pollen")
+        ax_draw.plot(df_pollen['translation_r_1'].to_numpy(), df_pollen['translation_r_2'].to_numpy(), linestyle="--", marker="o", alpha=0.5, markersize=2, label="r_arm_pollen")
+    
+    ax_draw.set_xlabel('Position y (m)')
+    ax_draw.set_ylabel('Position z (m)')
+    ax_draw.set_title(f'Draw of movement in torso frame with method: {method}')
+    ax_draw.legend()
+    
+    plt.tight_layout()
+    plt.savefig(f"{path}/{method}_plot_translation_draw.png", dpi=300)
     plt.show()
+
+
 
 
 def add_distance_metric(path, csv_filename):
@@ -345,15 +413,26 @@ def plot_all(method, path):
     # If the method is "pink_sphere", compute and plot the distance metric
     if method == "pink_sphere": 
         add_distance_metric(path, csv_filename)
-        plot_metrics_for_pink_sphere(path, csv_filename, method, 0.20)
+        df = pd.read_csv(os.path.join(path, csv_filename))
+        plot_metrics_for_pink_sphere(path, df, method, 0.20)
+    
+    # Load data from CSV
+    df = pd.read_csv(os.path.join(path, csv_filename))
+
+    path_pollen = f"/home/reachy/dev/reachy2_symbolic_ik/src/reachy2_symbolic_ik/csv_files_for_metrics.py/pollen"
+    if os.path.exists(os.path.join(path_pollen, f"metrics_pollen_l.csv")) and os.path.exists(os.path.join(path_pollen, f"metrics_pollen_r.csv")) : 
+        
+        csv_filename_pollen = f"metrics_pollen.csv"
+        merge_csv_file(path_pollen, "pollen", csv_filename_pollen)
+        df_pollen = pd.read_csv(os.path.join(path_pollen, csv_filename_pollen))
 
     # Generate and save various plots
-    plot_q(path, csv_filename, method)
-    plot_ecart_q(path, csv_filename, method, tolerance=0.8)
-    plot_ecart_pos(path, csv_filename, method)
-    plot_ecart_rot(path, csv_filename, method)
-    plot_translations(path, csv_filename, method)
-    plot_draw(path, csv_filename, method)
+    plot_q(path, df, method)
+    plot_velocity(path, df, method)
+    plot_velocity_std(path, df, method)
+    plot_ecart_q(path, df, method, tolerance=0.8)
+    plot_ecart_pos_rot(path, df, method)
+    plot_translations_and_draw(path, df, method, plot_goal=True, plot_pollen=True, df_pollen=df_pollen)
 
 ##################
 ##################
