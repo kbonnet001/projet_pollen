@@ -1,7 +1,5 @@
 # 📖 Developer documentation
 
-The URDF files **`head.urdf`** and **`reachy.urdf`** were generated from existing .xacro files to ensure compatibility with Pinocchio and Pink.
-
 ## Function Testing
 To test the implemented functions, a set of test functions is included in:
 
@@ -29,10 +27,24 @@ These functions utilize:
 📂 **`CSVLogger.py`**: Saves metrics into a CSV file.
 📂 **`plot_metrics.py`**
 
-This file contains functions to generate graphs from the recorded measurements.
+Several plotting functions are available to analyze the inverse kinematics resolution:  
 
+### Joint Angles and Velocities  
+- **`plot_q`**: Joint angles at each iteration.  
+- **`plot_velocity`**: Derivative of joint angles over time for each iteration.  
+- **`plot_velocity_std`**: Standard deviation of joint angle derivatives over time (computed over the last 10 iterations).  
 
+### Differences Between Iterations  
+- **`plot_ecart_q`**: Difference between the joint angle vectors at **t = i + 1** and **t = i** for each iteration.  
+- **`plot_ecart_pos_rot`**: Difference between positions (quaternions) at **t = i + 1** and **t = i** for each iteration.  
 
+### Trajectory and Goal Comparison  
+- **`plot_translations_and_draw`**:  
+  - Plots **x, y, and z** positions for each iteration.  
+  - Displays the drawn trajectory.  
+  - Optional parameters:  
+    - `plot_goal=True`: Compares the result with the true goal.  
+    - `plot_pollen=True`: Compares the result with Pollen's current resolution. 
 ## ⁉️ Purpose of this documentation
 
 This documentation is intended to the **future developers** re-using your work, e.g. students from next year.
