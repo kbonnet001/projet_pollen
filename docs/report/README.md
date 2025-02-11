@@ -42,7 +42,7 @@ iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
 
 Tests have been implemented, along with metric collection, to compare the different approaches.
 
-A first test involves asking Reachy2 to draw a rectangle with each of its hands ![video](assets/other_files/test_rectangle.mp4).
+A first test involves asking Reachy2 to draw a rectangle with each of its hands ![video](../assets/other_files/test_rectangle.mp4).
 
 #### Pinocchio
 The resolution using Pinocchio delivers limited performance and fails to accurately follow the dynamic reference. This outcome was expected, as this method relies on iterative convergence, making it unsuitable for real-time teleoperation tasks.
