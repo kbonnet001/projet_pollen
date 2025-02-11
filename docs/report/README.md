@@ -33,9 +33,10 @@ This approach serves as an intermediate step before integrating a quadratic prog
 
 Based on this foundation, additional constraints can be introduced, such as barriers or limits. A first proposal is to [add spherical barriers](https://stephane-caron.github.io/pink/barriers.html#module-pink.barriers.body_spherical_barrier) around the arm end-effectors to ensure a minimum distance between them and prevent collisions.
 
------------
+iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
 Guillaume + 
--iiiiiiiiiiiiiiiii
+iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
+
 
 ### Results
 
@@ -43,10 +44,17 @@ Tests have been implemented, along with metric collection, to compare the differ
 
 A first test involves asking Reachy2 to draw a rectangle with each of its hands (video).
 
-**Pinocchio**
+#### Pinocchio
 The resolution using Pinocchio delivers limited performance and fails to accurately follow the dynamic reference. This outcome was expected, as this method relies on iterative convergence, making it unsuitable for real-time teleoperation tasks.
 
 (graphs)
 
-**Pink**
+#### Pink
 This approach performs significantly better, managing to follow the dynamic reference with some minor inaccuracies. While this iterative method cannot compete with the current analytical resolution used by Pollen, it stands out for its flexibility in integrating constraints.
+(graph)
+
+#### Pink and Body Spherical barrier
+First, one possible approach is to integrate spherical barriers at the end-effectors. In this test, the hands are required to position themselves at the center of the torso, with a maximum deviation of 5 cm. With the barrier in place, where d_min = 20 cm, the hands do not collide.
+This contrasts with the current Pollen implementation, which stops the program and returns an error in such a situation.
+
+(graph)
