@@ -139,19 +139,49 @@ def get_current_joints_all(reachy: ReachySDK) :
 
     ])
 
-def get_current_joints(reachy: ReachySDK, prefix : str) :
+def get_current_joints(reachy: ReachySDK, prefix : str="all") :
 
-    reachy_arm = getattr(reachy, f"{prefix}_arm")
+    if prefix=="r" or prefix=="l":
 
-    return np.array([
-    reachy_arm.shoulder.pitch.present_position,
-    reachy_arm.shoulder.roll.present_position,
-    reachy_arm.elbow.yaw.present_position,
-    reachy_arm.elbow.pitch.present_position,
-    reachy_arm.wrist.roll.present_position,
-    reachy_arm.wrist.pitch.present_position,
-    reachy_arm.wrist.yaw.present_position
-    ])
+        reachy_arm = getattr(reachy, f"{prefix}_arm")
+
+        return np.array([
+        reachy_arm.shoulder.pitch.present_position,
+        reachy_arm.shoulder.roll.present_position,
+        reachy_arm.elbow.yaw.present_position,
+        reachy_arm.elbow.pitch.present_position,
+        reachy_arm.wrist.roll.present_position,
+        reachy_arm.wrist.pitch.present_position,
+        reachy_arm.wrist.yaw.present_position
+        ])
+    
+    elif prefix=="all":
+
+        return np.array([
+        reachy.l_arm.shoulder.pitch.present_position,
+        reachy.l_arm.shoulder.roll.present_position,
+        reachy.l_arm.elbow.yaw.present_position,
+        reachy.l_arm.elbow.pitch.present_position,
+        reachy.l_arm.wrist.roll.present_position,
+        reachy.l_arm.wrist.pitch.present_position,
+        reachy.l_arm.wrist.yaw.present_position, 
+
+        0,0,0,0,0, 
+
+        0,0,0,
+
+        reachy.r_arm.shoulder.pitch.present_position,
+        reachy.r_arm.shoulder.roll.present_position,
+        reachy.r_arm.elbow.yaw.present_position,
+        reachy.r_arm.elbow.pitch.present_position,
+        reachy.r_arm.wrist.roll.present_position,
+        reachy.r_arm.wrist.pitch.present_position,
+        reachy.r_arm.wrist.yaw.present_position,
+
+        0,0,0,0,0,
+
+        ])
+
 
 def get_joints_from_chosen_method(reachy: ReachySDK, model, data, H_THd, prefix, method, d_min=0.20, blocked_joints=None):
     #print("test get_joints_from_chosen_method")
@@ -249,7 +279,7 @@ def get_joints_from_chosen_method(reachy: ReachySDK, model, data, H_THd, prefix,
         for pose in H_THd : # on peut faire rapide
             goal_poses.append(np.dot(np.dot(H_WT, pose), H_HP))
 
-        current_joints_rad = np.deg2rad(get_current_joints_all(reachy))
+        current_joints_rad = np.deg2rad(get_current_joints(reachy))
         joint_rad = symbolic_inverse_kinematics_continuous_with_pink_merged(model, data, current_joints_rad, goal_poses, 
                                                                     prefix, debug=False, plot=False, d_min = d_min, blocked_joints=blocked_joints)
         
@@ -257,24 +287,7 @@ def get_joints_from_chosen_method(reachy: ReachySDK, model, data, H_THd, prefix,
         raise ValueError(f"'{method}' is not a valid method.")
     
     return np.rad2deg(joint_rad)
-
-
-def get_joints_from_chosen_method_poses(reachy: ReachySDK, model, data, poses, method, d_min) : 
-
-    q = np.deg2rad(get_current_joints_all(reachy))
-
-    goal_poses = []
-    for pose in poses : # on peut faire rapide
-        goal_poses.append(np.dot(np.dot(H_WT, pose), H_HP))
-
-    joint_rad = symbolic_inverse_kinematics_continuous_with_pink_sphere(
-    model, data,
-    q,
-    goal_poses,
-    solver="osqp", d_min=d_min, plot = True, debug=False)
-
-    return np.rad2deg(joint_rad[:7]), np.rad2deg(joint_rad[15:22])
-
+    
 #############################################################################
 
 def symbolic_inverse_kinematics_continuous_with_pinocchio(
@@ -487,8 +500,8 @@ def symbolic_inverse_kinematics_continuous_with_pink_sphere(
         compute_metrics(goal_pose_torso_l, q[:7], "l", "pink_sphere", config.q[:7], pose_compute_l_torso, velocity = velocity[:7])
         compute_metrics(goal_pose_torso_r, q[15:22], "r", "pink_sphere", config.q[15:22], pose_compute_r_torso, velocity = velocity[15:22])
 
-
-    return config.q
+    q = config.q
+    return q[:7], q[15:22]
 
 #################################################################################################################################
 
