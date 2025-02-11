@@ -337,7 +337,7 @@ def symbolic_inverse_kinematics_continuous_with_pinocchio(
         pin.updateFramePlacements(model, data)
         pose_compute_torso = np.dot(np.dot(np.linalg.inv(H_WT), data.oMi[JOINT_ID].homogeneous), np.linalg.inv(H_HP))
 
-        compute_metrics(goal_pose_torso, current_joints, prefix, "pinocchio", np.array(q.tolist()), pose_compute_torso)
+        compute_metrics(goal_pose_torso, current_joints, prefix, "pinocchio", np.array(q.tolist()), pose_compute_torso, velocity = np.array(v), )
 
     
     return q.tolist()
@@ -413,7 +413,7 @@ def symbolic_inverse_kinematics_continuous_with_pink(
         pose_compute_world = config.get_transform(f"{prefix}_wrist_yaw", "world")
         pose_compute_torso = np.dot(np.dot(np.linalg.inv(H_WT), pose_compute_world), np.linalg.inv(H_HP))
 
-        compute_metrics(goal_pose_torso, current_joints, prefix, "pink", config.q, pose_compute_torso)
+        compute_metrics(goal_pose_torso, current_joints, prefix, "pink", configuration.q, pose_compute_torso, velocity = velocity)
     
     return config.q
 
@@ -484,8 +484,8 @@ def symbolic_inverse_kinematics_continuous_with_pink_sphere(
         pose_compute_r_world = config.get_transform(f"r_wrist_yaw", "world")
         pose_compute_r_torso = np.dot(np.dot(np.linalg.inv(H_WT), pose_compute_r_world), np.linalg.inv(H_HP))
 
-        compute_metrics(goal_pose_torso_l, q[:7], "l", "pink_sphere", config.q[:7], pose_compute_l_torso)
-        compute_metrics(goal_pose_torso_r, q[15:22], "r", "pink_sphere", config.q[15:22], pose_compute_r_torso)
+        compute_metrics(goal_pose_torso_l, q[:7], "l", "pink_sphere", config.q[:7], pose_compute_l_torso, velocity = velocity[:7])
+        compute_metrics(goal_pose_torso_r, q[15:22], "r", "pink_sphere", config.q[15:22], pose_compute_r_torso, velocity = velocity[15:22])
 
 
     return config.q

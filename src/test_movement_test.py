@@ -41,12 +41,11 @@ def go_to_pose(reachy: ReachySDK, pose: npt.NDArray[np.float64], arm: str, metho
     if method == "pollen" : 
     
         ik = reachy_arm.inverse_kinematics(pose)
-        input(f"ik = {ik}")
 
         if PLOT : 
             current_joint = np.deg2rad(get_current_joints(reachy, arm[0]))
             pose_pollen = reachy_arm.forward_kinematics(ik)
-            compute_metrics(pose, current_joint, arm[0], "pollen", np.deg2rad(ik), pose_pollen)
+            compute_metrics(pose, current_joint, arm[0], "pollen", np.deg2rad(ik), pose_pollen, velocity = [])
 
 
     elif method == "pink" or method == "pinocchio":
@@ -309,7 +308,9 @@ def main_test() -> None:
 
     #############################
     #############################
+
     method = "pink_sphere" #pollen, pinocchio, pink, pink_sphere
+
     model, data = load_models(method)
     
     path = f"/home/reachy/dev/reachy2_symbolic_ik/src/reachy2_symbolic_ik/csv_files_for_metrics.py/{method}/metrics_{method}.csv"
@@ -323,11 +324,11 @@ def main_test() -> None:
     model_ = model["all"]
     data_ = data["all"]
 
-    make_semi_circle_z(reachy, method, model, data, radius=0.2, nbr_points= 50)
-    input()
+    # make_semi_circle_z(reachy, method, model, data, radius=0.2, nbr_points= 50)
+    # input()
 
 
-        ############
+    #     ############
 
     if method == "pink_sphere" : 
 

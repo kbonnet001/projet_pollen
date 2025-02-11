@@ -7,7 +7,7 @@ sys.path.append('/home/reachy/dev/reachy2_symbolic_ik/src/reachy2_symbolic_ik/')
 from CSVLogger import CSVLogger
 
 
-def compute_metrics(goal_pose, current_joints, prefix, method, q_compute, poses_compute):
+def compute_metrics(goal_pose, current_joints, prefix, method, q_compute, poses_compute, velocity = []):
 
     """
     Calcule les écarts de position, rotation et angles des articulations pour différentes méthodes (Pink, Pinocchio, etc.).
@@ -17,30 +17,33 @@ def compute_metrics(goal_pose, current_joints, prefix, method, q_compute, poses_
     ecart_q = np.abs(np.array(current_joints) - np.array(q_compute))
 
     translation = poses_compute[:3,3]
+    translation_goal = goal_pose[:3,3]
     q_current = R.from_matrix(poses_compute[:3,:3]).as_quat()
 
     ecart_distance, ecart_angle = compute_ecart_rot_pos_prefix(goal_pose, q_current, translation)
 
     # hearders
 
-    headers, log_data = log_logger(prefix, translation, current_joints, ecart_q, ecart_distance, ecart_angle)
+    headers, log_data = log_logger(prefix, translation, translation_goal, current_joints, ecart_q, ecart_distance, ecart_angle)
+
+    if velocity !=[] :
+        headers+= [f"velocity_{prefix}_{i}" for i in range(len(velocity))] 
+        log_data+= [*velocity]
 
     logger = CSVLogger(csv_filename, headers)
     logger.log(log_data)
 
 
 
-def log_logger(prefix, translations, current_joints, ecart_q, ecart_distance, ecart_angle) : 
+def log_logger(prefix, translation, translation_goal, current_joints, ecart_q, ecart_distance, ecart_angle) : 
 
-    headers = []
-    log_data = []
-
-    headers+= [f"q_{prefix}_{i}" for i in range(len(current_joints))] + \
-            [f"translation_{prefix}_{i}" for i in range(len(translations))] + \
+    headers = [f"q_{prefix}_{i}" for i in range(len(current_joints))] + \
+            [f"translation_goal_{prefix}_{i}" for i in range(len(translation_goal))] + \
+            [f"translation_{prefix}_{i}" for i in range(len(translation))] + \
             [f"ecart_q_{prefix}_{i}" for i in range(len(ecart_q))] + \
             [f"Ecart_pos_{prefix}", f"Ecart_rot_{prefix}"]
 
-    log_data+=[*current_joints, *translations, *ecart_q, ecart_distance, ecart_angle]
+    log_data =[*current_joints, *translation_goal, *translation, *ecart_q, ecart_distance, ecart_angle]
 
     
     return headers, log_data
