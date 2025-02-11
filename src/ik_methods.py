@@ -112,33 +112,6 @@ def modify_joint_limit(
     #print(f"model limits {model.upperPositionLimit}")
     #print(f"model limits {model.lowerPositionLimit}")
 
-def get_current_joints_all(reachy: ReachySDK) :
-
-    return np.array([
-    reachy.l_arm.shoulder.pitch.present_position,
-    reachy.l_arm.shoulder.roll.present_position,
-    reachy.l_arm.elbow.yaw.present_position,
-    reachy.l_arm.elbow.pitch.present_position,
-    reachy.l_arm.wrist.roll.present_position,
-    reachy.l_arm.wrist.pitch.present_position,
-    reachy.l_arm.wrist.yaw.present_position, 
-
-    0,0,0,0,0, 
-
-    0,0,0,
-
-    reachy.r_arm.shoulder.pitch.present_position,
-    reachy.r_arm.shoulder.roll.present_position,
-    reachy.r_arm.elbow.yaw.present_position,
-    reachy.r_arm.elbow.pitch.present_position,
-    reachy.r_arm.wrist.roll.present_position,
-    reachy.r_arm.wrist.pitch.present_position,
-    reachy.r_arm.wrist.yaw.present_position,
-
-    0,0,0,0,0,
-
-    ])
-
 def get_current_joints(reachy: ReachySDK, prefix : str="all") :
 
     if prefix=="r" or prefix=="l":

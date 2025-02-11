@@ -165,6 +165,47 @@ def make_circle(
             time.sleep(0.01)
 
 
+def make_spiral(
+    model, 
+    data,
+    reachy: ReachySDK,
+    method : str,
+    center: npt.NDArray[np.float64],
+    orientation: npt.NDArray[np.float64],
+    min_radius: float,
+    max_radius: float,
+    nbr_points: int = 1000,
+    number_of_turns: int = 3,
+) -> None:
+
+    delta_radius = (max_radius - min_radius)/number_of_turns 
+    delta_radius_for_turn = delta_radius/nbr_points
+    X = center[0]
+
+    for k in range(number_of_turns):
+        min_radius_for_turn = delta_radius*k+min_radius
+        for i in range(nbr_points):
+            radius = delta_radius_for_turn*i+min_radius_for_turn
+            Y_r = center[1] + radius * np.cos(2 * np.pi/nbr_points * i)
+            Y_l = -center[1] + radius * np.cos(2 * np.pi/nbr_points * i)
+            Z = center[2] + radius * np.sin(2 * np.pi/nbr_points * i)
+
+            r_position = np.array([X, Y_r, Z])
+            r_rotation_matrix = R.from_euler("xyz", orientation).as_matrix()
+            r_pose = make_homogenous_matrix_from_rotation_matrix(r_position, r_rotation_matrix)
+
+            l_position = np.array([X, Y_l, Z])
+            l_rotation_matrix = R.from_euler("xyz", orientation).as_matrix()
+            l_pose = make_homogenous_matrix_from_rotation_matrix(l_position, l_rotation_matrix)
+            
+            if method != "pink_sphere":
+                go_to_pose(reachy, r_pose, "r_arm", method, model, data)
+                go_to_pose(reachy, l_pose, "l_arm", method, model, data)
+            else:
+                go_to_pose(reachy, [l_pose, r_pose], "all", method, model, data)
+
+            time.sleep(0.01)
+
 def make_rectangle(
     reachy: ReachySDK,
     A: npt.NDArray[np.float64],
@@ -367,7 +408,12 @@ def main_test() -> None:
     make_semi_circle_z(reachy, method, model, data, radius=0.2, nbr_points= 50)
     input("fin")
 
-
+    print("making a spiral")
+    center = np.array([0.4, -0.4, -0.2])
+    orientation = np.array([0, -np.pi / 2, 0])
+    min_radius = 0.1
+    max_radius = 1
+    make_spiral(model, data, reachy, "pink_sphere", center, orientation, min_radius, max_radius, number_of_turns=5)
     #     ############
 
     if method == "pink_sphere" : 
