@@ -7,39 +7,16 @@ from reachy2_sdk import ReachySDK
 from scipy.spatial.transform import Rotation as R
 
 from reachy2_symbolic_ik.utils import make_homogenous_matrix_from_rotation_matrix
-from ik_methods import get_joints_from_chosen_method, reduce_model_pin_arm, get_current_joints
+from ik_methods_tool import get_joints_from_chosen_method, load_models, get_current_joints
 from compute_metrics import compute_metrics
-
-
-import pinocchio as pin
-from os.path import abspath
-import os
 
 
 PLOT = False
 
-
-def load_models(method, arm = ["l", "r"]) : 
-
-    path_urdf = "/home/reachy/reachy_ws/src/reachy2_core/reachy_description/urdf/reachy.urdf"
-
-    model = {}
-    data = {}
-
-    if method == "pinocchio" or method == "pink" : 
-        for prefix in arm : 
-            model[prefix], data[prefix] = reduce_model_pin_arm(prefix)
-
-    elif method == "pink_sphere" : 
-        model, _, _ = pin.buildModelsFromUrdf(abspath(path_urdf))
-        data = model.createData()
-
-    return model, data
-
-def go_to_pose(reachy: ReachySDK, pose: npt.NDArray[np.float64], arm: str, method:str, 
+def go_to_pose(reachy: ReachySDK, pose: npt.NDArray[np.float64], prefix: str, method:str, 
                model, data) -> None:
 
-    if method == "pink_sphere"  or method=="pink_final": 
+    if method == "pink V2"  or method=="pink_final": 
         ik = get_joints_from_chosen_method(reachy, model, data, pose, "all", method)
         
         for joint, goal_pos in zip(reachy.l_arm.joints.values(), ik[0]):
@@ -49,27 +26,24 @@ def go_to_pose(reachy: ReachySDK, pose: npt.NDArray[np.float64], arm: str, metho
             joint.goal_position = goal_pos
 
     elif method == "pollen" : 
+        reachy_arm = getattr(reachy, f"{prefix}_arm")
         ik = reachy_arm.inverse_kinematics(pose)
 
         if PLOT : 
-            current_joint = np.deg2rad(get_current_joints(reachy, arm[0]))
+            current_joint = np.deg2rad(get_current_joints(reachy, prefix))
             pose_pollen = reachy_arm.forward_kinematics(ik)
-            compute_metrics(pose, current_joint, arm[0], "pollen", np.deg2rad(ik), pose_pollen, velocity = [])
+            compute_metrics(pose, current_joint, prefix, "pollen", np.deg2rad(ik), pose_pollen, velocity = [])
 
 
     elif method == "pink" or method == "pinocchio":
-        reachy_arm = getattr(reachy, arm)
-        ik = get_joints_from_chosen_method(reachy, model[arm[0]], data[arm[0]], pose, arm[0], method)
+        reachy_arm = getattr(reachy, f"{prefix}_arm")
+        ik = get_joints_from_chosen_method(reachy, model[prefix], data[prefix], pose, prefix, method)
         for joint, goal_pos in zip(reachy_arm.joints.values(), ik):
             joint.goal_position = goal_pos
 
 
     else : 
         raise ValueError(f"'{method}' is not a valid method.")
-
-    # real_pose = reachy.r_arm.forward_kinematics(ik)
-    # pose_diff = np.linalg.norm(pose - real_pose)
-    # print(f"pose diff {pose_diff}")
     
 
     reachy.send_goal_positions()
@@ -80,10 +54,10 @@ def move_to_first_point(reachy: ReachySDK, orientation, position, prefix) -> Non
     target_pose = make_homogenous_matrix_from_rotation_matrix(position, rotation_matrix)
 
     # get the position in the joint space
-    reachy_arm = getattr(reachy, prefix)
+    reachy_arm = getattr(reachy, f"{prefix}_arm")
     joints_positions = reachy_arm.inverse_kinematics(target_pose)
     # move Reachy's right arm to this point
-    #print("Pollen Joint", joints_positions)
+
     reachy_arm.goto_joints(joints_positions, duration=2)
     # do time.sleep 
 
@@ -114,10 +88,10 @@ def make_line(
         l_rotation_matrix = R.from_euler("xyz", l_orientation).as_matrix()
         l_pose = make_homogenous_matrix_from_rotation_matrix(l_position, l_rotation_matrix)
 
-        if method != "pink_sphere" : 
+        if method != "pink V2" : 
 
-            go_to_pose(reachy, r_pose, "r_arm", method, model, data)
-            go_to_pose(reachy, l_pose, "l_arm", method, model, data)
+            go_to_pose(reachy, r_pose, "r", method, model, data)
+            go_to_pose(reachy, l_pose, "l", method, model, data)
 
         else :
             go_to_pose(reachy, [l_pose, r_pose], "all", method, model, data)
@@ -156,9 +130,9 @@ def make_circle(
             l_rotation_matrix = R.from_euler("xyz", orientation).as_matrix()
             l_pose = make_homogenous_matrix_from_rotation_matrix(l_position, l_rotation_matrix)
 
-            if method != "pink_sphere":
-                go_to_pose(reachy, r_pose, "r_arm", method, model, data)
-                go_to_pose(reachy, l_pose, "l_arm", method, model, data)
+            if method != "pink V2":
+                go_to_pose(reachy, r_pose, "r", method, model, data)
+                go_to_pose(reachy, l_pose, "l", method, model, data)
             else:
                 go_to_pose(reachy, [l_pose, r_pose], "all", method, model, data)
 
@@ -198,9 +172,9 @@ def make_spiral(
             l_rotation_matrix = R.from_euler("xyz", orientation).as_matrix()
             l_pose = make_homogenous_matrix_from_rotation_matrix(l_position, l_rotation_matrix)
             
-            if method != "pink_sphere":
-                go_to_pose(reachy, r_pose, "r_arm", method, model, data)
-                go_to_pose(reachy, l_pose, "l_arm", method, model, data)
+            if method != "pink V2":
+                go_to_pose(reachy, r_pose, "r", method, model, data)
+                go_to_pose(reachy, l_pose, "l", method, model, data)
             else:
                 go_to_pose(reachy, [l_pose, r_pose], "all", method, model, data)
 
@@ -221,8 +195,8 @@ def make_rectangle(
     orientation = [0, -np.pi / 2, 0]
 
     # Go to the firt point A (pollen)
-    #move_to_first_point(reachy, orientation, A, "r_arm")
-    #move_to_first_point(reachy, orientation, np.array([A[0], -A[1], A[2]]), "l_arm")
+    #move_to_first_point(reachy, orientation, A, "r")
+    #move_to_first_point(reachy, orientation, np.array([A[0], -A[1], A[2]]), "l")
     time.sleep(2)
 
     for i in range(number_of_turns):
@@ -238,13 +212,13 @@ def turn_hand(reachy: ReachySDK, position: npt.NDArray[np.float64], orientation_
         for i in range(100):
             rotation_matrix = R.from_euler("xyz", orientation).as_matrix()
             pose = make_homogenous_matrix_from_rotation_matrix(position, rotation_matrix)
-            print(pose)
-            go_to_pose(reachy, pose, "r_arm", method, model, data)
+            #print(pose)
+            go_to_pose(reachy, pose, "r", method, model, data)
             time.sleep(0.05)
             orientation[2] += 2 * np.pi / 100
             if orientation[2] > np.pi:
                 orientation[2] = -np.pi
-            print(orientation)
+            #print(orientation)
 
 
 def test_sphere(
@@ -263,8 +237,8 @@ def test_sphere(
     D = np.array([0.4, -0.01, -0.1]) 
 
     # Go to the firt point A (pollen)
-    move_to_first_point(reachy, orientation, A, "r_arm")
-    move_to_first_point(reachy, orientation, np.array([A[0], -A[1], A[2]]), "l_arm")
+    move_to_first_point(reachy, orientation, A, "r")
+    move_to_first_point(reachy, orientation, np.array([A[0], -A[1], A[2]]), "l")
     time.sleep(2)
 
     make_line(reachy, np.array([A, orientation]), np.array([B, orientation]), method, model, data, nbr_points)
@@ -296,8 +270,8 @@ def make_semi_circle_z(
 
     point_start = np.array([0.6, -0.2, -0.1])
     # Go to the firt point (pollen)
-    move_to_first_point(reachy, orientation, point_start, "r_arm")
-    move_to_first_point(reachy, orientation, np.array([point_start[0], -point_start[1], point_start[2]]), "l_arm")
+    move_to_first_point(reachy, orientation, point_start, "r")
+    move_to_first_point(reachy, orientation, np.array([point_start[0], -point_start[1], point_start[2]]), "l")
     time.sleep(2)
 
 
@@ -319,14 +293,14 @@ def make_semi_circle_z(
             l_rotation_matrix = R.from_euler("xyz", orientation).as_matrix()
             l_pose = make_homogenous_matrix_from_rotation_matrix(l_position, l_rotation_matrix)
             
-            if method != "pink_sphere":
-                go_to_pose(reachy, r_pose, "r_arm", method, model, data)
-                go_to_pose(reachy, l_pose, "l_arm", method, model, data)
+            if method != "pink V2":
+                go_to_pose(reachy, r_pose, "r", method, model, data)
+                go_to_pose(reachy, l_pose, "l", method, model, data)
 
             else:
                 go_to_pose(reachy, [l_pose, r_pose], "all", method, model, data)
 
-            print("position = ", X[i], Y_r[i], Z[i])
+            #print("position = ", X[i], Y_r[i], Z[i])
 
             time.sleep(0.01)
 
@@ -343,34 +317,19 @@ prefix : str
     j=0
     for i in indices:
         new_joints[i] =  new_q[j]
-        #print(f"new_joint {i}= {int(new_joints[i])}")
         j+=1
 
-    arm = f"{prefix}_arm"
-    reachy_arm = getattr(reachy, arm)
-    pose = reachy_arm.forward_kinematics(new_joints)
+    if prefix != "all":
+        reachy_arm = getattr(reachy, f"{prefix}_arm")
+        pose = reachy_arm.forward_kinematics(new_joints)
+    
+    else:
+        l_pose = reachy.l_arm.forward_kinematics(new_joints[:7])
+        r_pose = reachy.r_arm.forward_kinematics(new_joints[15:22])
+        pose = [l_pose, r_pose]
 
-    go_to_pose(reachy, np.array(pose), arm, "pink", model, data)
-    time.sleep(0.001)
 
-def move_q_all(
-model,
-data,
-reachy : ReachySDK,
-indices : np.array,
-new_q : np.array,
-) -> None:
-    new_joints = get_current_joints(reachy)
-    j=0
-    for i in indices:
-        new_joints[i] =  new_q[j]
-        #print(f"new_joint {i}= {int(new_joints[i])}")
-        j+=1
-
-    l_pose = reachy.l_arm.forward_kinematics(new_joints[:7])
-    r_pose = reachy.r_arm.forward_kinematics(new_joints[15:22])
-
-    go_to_pose(reachy, np.array([l_pose, r_pose]), "all", "pink", model, data)
+    go_to_pose(reachy, np.array(pose), prefix, "pink", model, data)
     time.sleep(0.001)
 
 ##########################################
@@ -393,7 +352,7 @@ def main_test() -> None:
     #############################
     #############################
 
-    method = "pink_sphere" #pollen, pinocchio, pink, pink_sphere
+    method = "pink V2" #pollen, pinocchio, pink, pink_sphere
 
     model, data = load_models(method)
     
@@ -413,10 +372,10 @@ def main_test() -> None:
     orientation = np.array([0, -np.pi / 2, 0])
     min_radius = 0.1
     max_radius = 1
-    make_spiral(model, data, reachy, "pink_sphere", center, orientation, min_radius, max_radius, number_of_turns=5)
+    make_spiral(model, data, reachy, "pink V2", center, orientation, min_radius, max_radius, number_of_turns=5)
     #     ############
 
-    if method == "pink_sphere" : 
+    if method == "pink V2" : 
 
         # print("Test pink with barrier sphere)")
         # test_sphere(reachy, method, model, data)
