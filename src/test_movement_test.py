@@ -7,8 +7,8 @@ from reachy2_sdk import ReachySDK
 from scipy.spatial.transform import Rotation as R
 
 from reachy2_symbolic_ik.utils import make_homogenous_matrix_from_rotation_matrix
-from reachy2_symbolic_ik.ik_methods import get_joints_from_chosen_method, reduce_model_pin_arm, get_joints_from_chosen_method_poses, get_current_joints
-from reachy2_symbolic_ik.compute_metrics import compute_metrics
+from ik_methods import get_joints_from_chosen_method, reduce_model_pin_arm, get_joints_from_chosen_method_poses, get_current_joints
+from compute_metrics import compute_metrics
 
 
 import pinocchio as pin
@@ -16,7 +16,7 @@ from os.path import abspath
 import os
 
 
-PLOT = True
+PLOT = False
 
 
 def load_models(method, arm = ["l", "r"], path_urdf = "/home/reachy/reachy_ws/src/reachy2_core/reachy_description/urdf/reachy.urdf") : 
@@ -52,7 +52,7 @@ def go_to_pose(reachy: ReachySDK, pose: npt.NDArray[np.float64], arm: str, metho
         ik = get_joints_from_chosen_method(reachy, model[arm[0]], data[arm[0]], pose, arm[0], method)
 
     elif method == "pink_sphere" : 
-        ik = get_joints_from_chosen_method(reachy, model["all"], data, pose, arm[0], method)
+        ik = get_joints_from_chosen_method(reachy, model["all"], data["all"], pose, arm[0], method)
 
     else : 
         raise ValueError(f"'{method}' is not a valid method.")
@@ -68,7 +68,7 @@ def go_to_pose(reachy: ReachySDK, pose: npt.NDArray[np.float64], arm: str, metho
 def go_to_poses(reachy: ReachySDK, pose: npt.NDArray[np.float64], method:str, 
                model, data) -> None:
 
-    ik_l, ik_r = get_joints_from_chosen_method_poses(reachy, model["all"], data["all"], pose, method, d_min=0.20) #pink_sphere
+    ik_l, ik_r = get_joints_from_chosen_method(reachy, model["all"], data["all"], pose, "all", method, d_min=0.20) #pink_sphere
 
     for joint, goal_pos in zip(reachy.l_arm.joints.values(), ik_l):
         joint.goal_position = goal_pos
@@ -265,17 +265,23 @@ def make_semi_circle_z(
     X = center[0] + radius * np.cos(np.linspace(0, np.pi, nbr_points))
     Y_l = -center[1] + radius * np.sin(np.linspace(0, np.pi, nbr_points))
 
+
     for k in range(number_of_turns):
         for i in range(nbr_points):
             position = np.array([X[i], Y_r[i], Z[i]])
             rotation_matrix = R.from_euler("xyz", orientation).as_matrix()
             pose = make_homogenous_matrix_from_rotation_matrix(position, rotation_matrix)
-            go_to_pose(reachy, pose, "r_arm", method, model, data)
 
             l_position = np.array([X[i], Y_l[i], Z[i]])
             l_rotation_matrix = R.from_euler("xyz", orientation).as_matrix()
             l_pose = make_homogenous_matrix_from_rotation_matrix(l_position, l_rotation_matrix)
-            go_to_pose(reachy, l_pose, "l_arm", method, model, data)
+            
+            if method != "pink_sphere":
+                go_to_pose(reachy, pose, "r_arm", method, model, data)
+                go_to_pose(reachy, l_pose, "l_arm", method, model, data)
+
+            else:
+                go_to_poses(reachy, [l_pose, pose], method, model, data)
 
             print("position = ", X[i], Y_r[i], Z[i])
 
@@ -302,17 +308,21 @@ def main_test() -> None:
 
     #############################
     #############################
-    method = "pollen" #pollen, pinocchio, pink, pink_sphere
+
+    method = "pink_sphere" #pollen, pinocchio, pink, pink_sphere
+
     model, data = load_models(method)
     
     path = f"/home/reachy/dev/reachy2_symbolic_ik/src/reachy2_symbolic_ik/csv_files_for_metrics.py/{method}/metrics_{method}.csv"
     folder_path = f"/home/reachy/dev/reachy2_symbolic_ik/src/reachy2_symbolic_ik/csv_files_for_metrics.py/{method}"
 
-    for filename in os.listdir(folder_path):
-        file_path = os.path.join(folder_path, filename)
-        if os.path.isfile(file_path):
-            os.remove(file_path)
+    # for filename in os.listdir(folder_path):
+    #     file_path = os.path.join(folder_path, filename)
+    #     if os.path.isfile(file_path):
+    #         os.remove(file_path)
 
+    model_ = model["all"]
+    data_ = data["all"]
 
     # make_semi_circle_z(reachy, method, model, data, radius=0.2, nbr_points= 50)
     # input()
