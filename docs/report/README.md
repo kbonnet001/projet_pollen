@@ -25,11 +25,28 @@ To address this challenge, we conducted a [state-of-the-art review](docs/bibliog
 
 ## 📈 Analysis of results
 
-**Qualify** and **quantify** your achievements. Make measurements from your work, e.g.:
+### Realisations 
 
-* **User tests**: Setup a methodology to test the efficiency of your project against users. It may use pre-experiment and post-experiment questionnaires. The most users the better to draw meaningful conclusions from your experiments. Radar diagrams are good to summarize such results.
-* **Table of data**: Provide (short) extracts of data and relevant statistics (distribution, mean, standard deviation, p-values...)
-* **Plots**: Most data are more demonstrative when represented as plots. 
+Following the results of the state of the art, an initial inverse kinematics solution was developed using the Jacobian-based iterative algorithm. This implementation is based on the Pinocchio library and is largely inspired by [this example from the official documentation](https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/md_doc_b_examples_d_inverse_kinematics.html).
 
-Draw conclusions, **interpret** the results and make recommandations to your client for your future of the work.
-It is totally fine to have results that are not as good as initially expected. Be honest and analyse why you did not manage to reach the objectives.
+This approach serves as an intermediate step before integrating a quadratic programming (QP) resolution and implementing constraints. To achieve this, the Pink library, built on Pinocchio, is used. It directly incorporates system limits by leveraging the robot's URDF model.
+
+Based on this foundation, additional constraints can be introduced, such as barriers or limits. A first proposal is to [add spherical barriers](https://stephane-caron.github.io/pink/barriers.html#module-pink.barriers.body_spherical_barrier) around the arm end-effectors to ensure a minimum distance between them and prevent collisions.
+
+-----------
+Guillaume + 
+-iiiiiiiiiiiiiiiii
+
+### Results
+
+Tests have been implemented, along with metric collection, to compare the different approaches.
+
+A first test involves asking Reachy2 to draw a rectangle with each of its hands (video).
+
+**Pinocchio**
+The resolution using Pinocchio delivers limited performance and fails to accurately follow the dynamic reference. This outcome was expected, as this method relies on iterative convergence, making it unsuitable for real-time teleoperation tasks.
+
+(graphs)
+
+**Pink**
+This approach performs significantly better, managing to follow the dynamic reference with some minor inaccuracies. While this iterative method cannot compete with the current analytical resolution used by Pollen, it stands out for its flexibility in integrating constraints.
