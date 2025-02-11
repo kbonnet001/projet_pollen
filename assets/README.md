@@ -10,7 +10,7 @@ Contains **`reachy.urdf`** and **`head.urdf`**, which are converted from the ori
 📂 **`csv_files_for_metrics/`**
 
 Stores all CSV files and graphs generated for each tested method.
-Analysis of the test results are presented in this [other README](docs/report/README.md).
+Analysis of the test results are presented in this [other README](./docs/report/README.md).
 ## Additional Files
 📂 **`other_files/`**
 
