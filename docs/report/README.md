@@ -60,7 +60,7 @@ This approach performs significantly better, managing to follow the dynamic refe
 More graphics for this method are available [in this folder](../../assets/csv_files_for_metrics/pink).
 
 #### Pink and Body Spherical barrier
-One possible approach is to integrate spherical barriers at the end-effectors.![In this test](../../assets/other_files/pink_sphere.mp4) , the hands are required to position themselves at the center of the torso, with a maximum deviation of 0.05 m. With the barrier in place, where d_min = 0.2 m, the hands do not collide.
+One possible approach is to integrate spherical barriers at the end-effectors. ![In this test](../../assets/other_files/pink_sphere.mp4), the hands are required to position themselves at the center of the torso, with a maximum deviation of 0.05 m. With the barrier in place, where d_min = 0.2 m, the hands do not collide.
 This contrasts with the current Pollen implementation, which stops the program and returns an error in such a situation.
 
 ![plot_draw_sphere](../../assets/csv_files_for_metrics/pink_sphere/pink_sphere_plot_translation_draw.png)
