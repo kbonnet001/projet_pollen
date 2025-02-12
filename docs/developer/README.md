@@ -7,13 +7,22 @@ To test the implemented functions, a set of test functions is included in:
 
 This file, largely inspired by **`movement_test.py`**, includes:
 
-**`load_model`**: Loads the required URDF model for Pinocchio or Pink.
 **`test_sphere`**: Evaluates the effectiveness of spherical barriers.
+**`make_spiral`**: Create a spiral with an increasing radius with Reachy's hand.
+**`move_q`**: Give goal_position according to a movement Reachy could do by using only the selected q. (Attention: if the other joints aren't blocked in place with the variable blocked_joints, they will move to reach the end_goal, preventing the robot to move only the desired joints.)
+
+To acccomplish those tasks, this file will call the 📂 **`/home/reachy/dev/reachy2_symbolic_ik/src/reachy2_symbolic_ik/ik_methods_tool.py`** file.
+This file contain function to communicate and simplify the use of various ik methods, by including :
+
+**`load_model`**: Loads the required URDF model for Pinocchio or Pink.
+**`get_joints from_chosen_method`**: Call upon the chosen ik method with correct treatement of data to obtain the result of the inverse kinematics result.
+**`get_current_joints`**: Get the current joints of the robot.
+
 
 ## Inverse Kinematics Methods
 📂 **`/home/reachy/dev/reachy2_symbolic_ik/src/reachy2_symbolic_ik/ik_methods.py`**
 
-This file contains the programmed inverse kinematics functions for Pinocchio and Pink, along with other essential utilities. The functions below may eventually replace symbolic_inverse_kinematics_continuous in:
+This file contains the programmed inverse kinematics functions for Pinocchio and Pin. The functions below may eventually replace symbolic_inverse_kinematics_continuous in:
 
 📂 **`/home/reachy/dev/reachy2_symbolic_ik/src/reachy2_symbolic_ik/control_ik.py`**
 
@@ -21,6 +30,7 @@ This file contains the programmed inverse kinematics functions for Pinocchio and
 **`symbolic_inverse_kinematics_continuous_with_pink`**: Solves inverse kinematics using the QP method with Pink.
 **`symbolic_inverse_kinematics_continuous_with_pink_sphere`**: Solves inverse kinematics using the QP method with Pink, integrating spherical barriers at the end-effectors.
 **`symbolic_inverse_kinematics_continuous_with_pink_V2`**: Solves inverse kinematics using the QP method with Pink, integrating both the previous spherical barriers and some other modification like correcting the joint and velocity constraint.
+
 ## Metrics and Visualization
 These functions utilize:
 
