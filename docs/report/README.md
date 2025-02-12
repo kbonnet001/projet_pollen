@@ -2,7 +2,7 @@
 
 # 📖 Report
 
-## ⁉️ Specifications
+## ⁉️ Context
 
 [Pollen](https://www.pollen-robotics.com/), a start-up located in Bordeaux, develops [Reachy](https://github.com/pollen-robotics), an anthropomorphic robot primarily used for immersive teleoperation applications. In these applications, enhancing the user's sense of control is essential but must not come at the expense of safety. It is therefore crucial to ensure the optimal execution of commands while respecting both the robot's intrinsic and extrinsic constraints. Furthermore, continuously providing feedback on the robot's capabilities can contribute to this sense of control by reducing the gap between the commanded action and the one actually performed.  
 
@@ -42,19 +42,24 @@ iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
 
 Tests have been implemented, along with metric collection, to compare the different approaches.
 
-A first test involves asking Reachy2 to draw a rectangle with each of its hands ![video](../../assets/other_files/test_rectangle.mp4).
+A first test involves asking Reachy2 to ![draw a rectangle](../../assets/other_files/test_rectangle.mp4) with each of its hands 
 
 #### Pinocchio
 The resolution using Pinocchio delivers limited performance and fails to accurately follow the dynamic reference. This outcome was expected, as this method relies on iterative convergence, making it unsuitable for real-time teleoperation tasks.
 
-(graphs)
+![plot_draw_pinocchio](../../assets/csv_files_for_metrics/pinocchio/pinocchio_plot_translation_draw.png)
+More graphics for this method are available [in this folder](../../assets/csv_files_for_metrics/pinocchio).
 
 #### Pink
 This approach performs significantly better, managing to follow the dynamic reference with some minor inaccuracies. While this iterative method cannot compete with the current analytical resolution used by Pollen, it stands out for its flexibility in integrating constraints.
-(graph)
+
+![plot_draw_pink](../../assets/csv_files_for_metrics/pink/pink_plot_translation_draw.png)
+More graphics for this method are available [in this folder](../../assets/csv_files_for_metrics/pink).
 
 #### Pink and Body Spherical barrier
-First, one possible approach is to integrate spherical barriers at the end-effectors. In this test, the hands are required to position themselves at the center of the torso, with a maximum deviation of 5 cm. With the barrier in place, where d_min = 20 cm, the hands do not collide.
+One possible approach is to integrate spherical barriers at the end-effectors.![In this test](../../assets/other_files/pink_sphere.mp4) , the hands are required to position themselves at the center of the torso, with a maximum deviation of 0.05 m. With the barrier in place, where d_min = 0.2 m, the hands do not collide.
 This contrasts with the current Pollen implementation, which stops the program and returns an error in such a situation.
 
-(graph)
+![plot_draw_sphere](../../assets/csv_files_for_metrics/pink_sphere/pink_sphere_plot_translation_draw.png)
+![plot_draw_sphere](../../assets/csv_files_for_metrics/pink_sphere/pink_sphere_plot_distance_sphere.png)
+More graphics for this method are available [in this folder](../../assets/csv_files_for_metrics/pink_sphere).

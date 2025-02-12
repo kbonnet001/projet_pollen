@@ -1,22 +1,14 @@
-# Name of my project
+# Robotic Project
 
-**Description:** Template for deliverables of robotics projects at Bordeaux-INP.
-Replace this description by a sentence summarizing your project.
-
-<img src="https://via.placeholder.com/900x300.png?text=Video+illustrating+your+project,+or+picture"> 
+**Description:** Adaptation of Teleoperation Commands to Account for Intrinsic and Extrinsic Constraints: Application to the Reachy Robot
 
 [📖 User documentation](docs/user) • [👨‍💻 Developer documentation](docs/developer) • [📈 Project report](docs/report) • [📚 Bibliography](docs/bibliography) • [⚠️ Risk Analysis](docs/risk)
   
 ## 📄 This project in short
-This paragraph is for the visitors who fly over your work and cannot read the whole documentation. They dislike long texts.
+This project explores various alternatives to the inverse kinematics solution implemented by Pollen Robotics, aiming to manage the robot's constraints and limitations. 
+The Pinocchio and Pink libraries are used to carry out this work. Among the proposed solutions, the QP-based approach with barrier integration shows promising potential.
 
-Be **concise** and **convincing** to show the potential of your project. Be **honest** and list the limitations.  
-
-* The context and the intented users
-* The problems solved by your project
-* How it solves them
-
-## 🚀 Quickstart (if relevant)
+## 🚀 Quickstart
 
 * **Install instructions**: List of software/hardware dependencies, and instructions to install them if relevant
 * **Launch instructions**: Few lines of code to launch the main feature of your project
@@ -27,20 +19,9 @@ If this is written in user or dev docs, provide links.
 
 |       |        |
 |:----------------------------:|:-----------------------------------------------------------------------:|
-| 💼 **Client**                |  Name of your Client *(1)*                                              |
+| 💼 **Client**                |  Rémi Fabre and Vincent Padois                                           |
 | 🔒 **Confidentiality**       | **Public** or **Private** *(1)*                                         |
 | ⚖️ **License**               |  [Choose a license](https://choosealicense.com/) *(1)*                  |
-| 👨‍👨‍👦 **Authors**               |  Student names, with a link to their social media profile or website    |
+| 👨‍👨‍👦 **Authors**               |  Kloé Bonnet and Guillaume Lauga    |
 
 
-*(1) Refer to your client to make a choice. Then update the repository accordingly: the visibility in the settings and replace the [LICENSE](./LICENSE) file.*
-
-## ✔️ Additional advices
-
-* Do not make **passwords** and secret keys public. If you have to, replace it by a random string and a warning in the doc telling to replace it
-* Avoid **long sentences**. Often, bullet points are easier to read
-* **Illustrate** your reports. Use colored plots, schematics and pictures. But do not abuse of them
-* Do not **duplicate** information. If it may be relevant at several places, make links
-* **English** is the universal langage worldwide. Write all engineering documents in English
-* Choose carefully **what sections** apply to your project and delete/add anything from the template that you think relevant
-* Remove anything that would **pollute** reading, including these instructions and irrelevant sections
