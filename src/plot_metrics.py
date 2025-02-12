@@ -311,54 +311,59 @@ def plot_ecart_pos_rot(path, df, method):
     plt.tight_layout()
     plt.savefig(f"{path}/{method}_plot_ecart_pos_rot.png", dpi=300)
     plt.show()
-
-def plot_translations_and_draw(path, df, method, plot_goal=True, plot_pollen=True, df_pollen=None):
-    """
-    Combines translation plots (x, y, z) on the left and a movement draw on the right.
-    """
-    fig, axes = plt.subplots(3, 2, figsize=(10, 6), sharex='col', 
-                             gridspec_kw={'width_ratios': [1, 1], 'height_ratios': [1, 1, 1]})
     
+def plot_translations(path, df, method, plot_goal=True, plot_pollen=True, df_pollen=None):
+    """
+    Plots the evolution of x, y, z translations over iterations.
+    """
+    fig, axes = plt.subplots(3, 1, figsize=(8, 6), sharex=True)
+
     iterations = df["Iteration"].to_numpy()
     label_pos = ["x", "y", "z"]
     colors = ["r", "g", "b"]
-    
-    # Left side: Translation plots
-    for i in range(3):
-        axes[i, 0].plot(iterations, df[f'translation_l_{i}'].to_numpy(), marker="o", markersize=2, label=f"{label_pos[i]}_{method}", color=colors[i])
-        if plot_goal:
-            axes[i, 0].plot(iterations, df[f'translation_goal_l_{i}'].to_numpy(), linestyle="--", marker="o", markersize=2, alpha=0.5, label=f"{label_pos[i]}_goal")
-        if plot_pollen and method != "pollen" and isinstance(df_pollen, pd.DataFrame):
-            axes[i, 0].plot(iterations, df_pollen[f'translation_l_{i}'].to_numpy(), linestyle="--", marker="o", markersize=2, alpha=0.5, label=f"{label_pos[i]}_pollen")
-        
-        axes[i, 0].set_ylabel(f"Position {label_pos[i]} (m)")
-        axes[i, 0].legend()
 
-    fig.text(0.25, 0.95, "Evolution of position for each pose (l_arm)", fontsize=12, ha='center')
-    
-    # Right side: Draw (spanning all rows)
-    ax_draw = fig.add_subplot(1, 2, 2)
-    ax_draw.plot(df['translation_l_1'].to_numpy(), df['translation_l_2'].to_numpy(), marker="o", markersize=2, label=f"l_arm_{method}")
-    ax_draw.plot(df['translation_r_1'].to_numpy(), df['translation_r_2'].to_numpy(), marker="o", markersize=2, label=f"r_arm_{method}")
-    
-    if plot_goal:
-        ax_draw.plot(df['translation_goal_l_1'].to_numpy(), df['translation_goal_l_2'].to_numpy(), linestyle="--", marker="o", alpha=0.5, markersize=2, label="l_arm_goal")
-        ax_draw.plot(df['translation_goal_r_1'].to_numpy(), df['translation_goal_r_2'].to_numpy(), linestyle="--", marker="o", alpha=0.5, markersize=2, label="r_arm_goal")
-    
-    if plot_pollen and method != "pollen" and isinstance(df_pollen, pd.DataFrame):
-        ax_draw.plot(df_pollen['translation_l_1'].to_numpy(), df_pollen['translation_l_2'].to_numpy(), linestyle="--", marker="o", alpha=0.5, markersize=2, label="l_arm_pollen")
-        ax_draw.plot(df_pollen['translation_r_1'].to_numpy(), df_pollen['translation_r_2'].to_numpy(), linestyle="--", marker="o", alpha=0.5, markersize=2, label="r_arm_pollen")
-    
-    ax_draw.set_xlabel('Position y (m)')
-    ax_draw.set_ylabel('Position z (m)')
-    ax_draw.set_title(f'Draw of movement in torso frame with method: {method}')
-    ax_draw.legend()
+    for i in range(3):
+        axes[i].plot(iterations, df[f'translation_l_{i}'].to_numpy(), marker="o", markersize=2, label=f"{label_pos[i]}_{method}", color=colors[i])
+        if plot_goal:
+            axes[i].plot(iterations, df[f'translation_goal_l_{i}'].to_numpy(), linestyle="--", marker="o", markersize=2, alpha=0.5, label=f"{label_pos[i]}_goal")
+        if plot_pollen and method != "pollen" and isinstance(df_pollen, pd.DataFrame):
+            axes[i].plot(iterations, df_pollen[f'translation_l_{i}'].to_numpy(), linestyle="--", marker="o", markersize=2, alpha=0.5, label=f"{label_pos[i]}_pollen")
+
+        axes[i].set_ylabel(f"Position {label_pos[i]} (m)")
+        axes[i].legend()
+
+    fig.suptitle("Evolution of position for each pose (l_arm)", fontsize=12)
+    axes[-1].set_xlabel("Iterations")
     
     plt.tight_layout()
-    plt.savefig(f"{path}/{method}_plot_translation_draw.png", dpi=300)
+    plt.savefig(f"{path}/{method}_plot_translations.png", dpi=300)
     plt.show()
 
+def plot_movement_draw(path, df, method, plot_goal=True, plot_pollen=True, df_pollen=None):
+    """
+    Plots the movement of left and right arm in a 2D plane.
+    """
+    fig, ax = plt.subplots(figsize=(6, 6))
 
+    ax.plot(df['translation_l_1'].to_numpy(), df['translation_l_2'].to_numpy(), marker="o", markersize=2, label=f"l_arm_{method}")
+    ax.plot(df['translation_r_1'].to_numpy(), df['translation_r_2'].to_numpy(), marker="o", markersize=2, label=f"r_arm_{method}")
+
+    if plot_goal:
+        ax.plot(df['translation_goal_l_1'].to_numpy(), df['translation_goal_l_2'].to_numpy(), linestyle="--", marker="o", alpha=0.5, markersize=2, label="l_arm_goal")
+        ax.plot(df['translation_goal_r_1'].to_numpy(), df['translation_goal_r_2'].to_numpy(), linestyle="--", marker="o", alpha=0.5, markersize=2, label="r_arm_goal")
+
+    if plot_pollen and method != "pollen" and isinstance(df_pollen, pd.DataFrame):
+        ax.plot(df_pollen['translation_l_1'].to_numpy(), df_pollen['translation_l_2'].to_numpy(), linestyle="--", marker="o", alpha=0.5, markersize=2, label="l_arm_pollen")
+        ax.plot(df_pollen['translation_r_1'].to_numpy(), df_pollen['translation_r_2'].to_numpy(), linestyle="--", marker="o", alpha=0.5, markersize=2, label="r_arm_pollen")
+
+    ax.set_xlabel('Position y (m)')
+    ax.set_ylabel('Position z (m)')
+    ax.set_title(f'Draw of movement in torso frame with method: {method}')
+    ax.legend()
+
+    plt.tight_layout()
+    plt.savefig(f"{path}/{method}_plot_movement_draw.png", dpi=300)
+    plt.show()
 
 
 def add_distance_metric(path, csv_filename):
@@ -434,7 +439,8 @@ def plot_all(method, path):
     
     plot_ecart_q(path, df, method, tolerance=0.8)
     plot_ecart_pos_rot(path, df, method)
-    plot_translations_and_draw(path, df, method, plot_goal=True, plot_pollen=False, df_pollen=df_pollen)
+    plot_translations(path, df, method, plot_goal=True, plot_pollen=False, df_pollen=df_pollen)
+    plot_movement_draw(path, df, method, plot_goal=True, plot_pollen=False, df_pollen=df_pollen)
 
 ##################
 ##################

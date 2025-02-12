@@ -344,7 +344,7 @@ def symbolic_inverse_kinematics_continuous_with_pink_V2(
 
     q_limit = pink.limits.ConfigurationLimit(model, config_limit_gain=0.6)
     v_limit = pink.limits.VelocityLimit(model)
-    a_limit = pink.limits.AccelerationLimit(model, np.ones(27)*100)
+    a_limit = pink.limits.AccelerationLimit(model, np.ones(27)*1000)
 
     # Regrouper toutes les tâches
     tasks = [l_ee_task, r_ee_task, damping_task, posture_task, posture_zero_task]

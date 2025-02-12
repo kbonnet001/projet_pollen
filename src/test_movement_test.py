@@ -74,7 +74,7 @@ def move_to_first_point_iterative(reachy: ReachySDK, orientations, positions, me
     rotation_matrix_r = R.from_euler("xyz", orientations[0]).as_matrix()
     r_pose = make_homogenous_matrix_from_rotation_matrix(positions[0], rotation_matrix_r)
 
-    for _ in range(80): 
+    for _ in range(20): 
         if method != "pink_V2" : 
 
             go_to_pose(reachy, r_pose, "r", method, model, data)
@@ -217,10 +217,15 @@ def make_rectangle(
 ) -> None:
     orientation = [0, -np.pi / 2, 0]
 
-    # Go to the firt point A (pollen)
-    move_to_first_point(reachy, orientation, A, "r")
-    move_to_first_point(reachy, orientation, np.array([A[0], -A[1], A[2]]), "l")
-    time.sleep(2)
+    if method =="pink_V2":
+        time.sleep(3)
+        move_to_first_point_iterative(reachy, [orientation, orientation], [A, [A[0], -A[1], A[2]]], method, model, data)
+        time.sleep(2)
+    else : 
+        # Go to the firt point A (pollen)
+        move_to_first_point(reachy, orientation, A, "r")
+        move_to_first_point(reachy, orientation, np.array([A[0], -A[1], A[2]]), "l")
+        time.sleep(2)
 
     for i in range(number_of_turns):
         make_line(reachy, np.array([A, orientation]), np.array([B, orientation]), method, model, data, nbr_points)
@@ -400,23 +405,23 @@ def main_test() -> None:
         # make_semi_circle_z(reachy, method, model, data, radius=0.2, nbr_points= 50)
         # input("next")
 
-        print("Test pink with barrier sphere")
-        test_sphere(reachy, method, model, data, nbr_points = 200)
+        # print("Test pink with barrier sphere")
+        # test_sphere(reachy, method, model, data, nbr_points = 50)
 
-        # print("making a spiral")
-        # center = np.array([0.4, -0.4, -0.2])
-        # orientation = np.array([0, -np.pi / 2, 0])
-        # min_radius = 0.1
-        # max_radius = 1
-        # make_spiral(model, data, reachy, "pink_V2", center, orientation, min_radius, max_radius, number_of_turns=5)
+        print("making a spiral")
+        center = np.array([0.4, -0.4, -0.2])
+        orientation = np.array([0, -np.pi / 2, 0])
+        min_radius = 0.1
+        max_radius = 1
+        make_spiral(model, data, reachy, "pink_V2", center, orientation, min_radius, max_radius, number_of_turns=5)
     #     ############
 
-        # print("Making a rectangle (pink sphere)")
+        # print("Making a rectangle (pink_V2)")
         # A = np.array([0.4, -0.5, -0.3])
         # B = np.array([0.4, -0.5, -0.1])
         # C = np.array([0.4, -0.2, -0.1])
         # D = np.array([0.4, -0.2, -0.3])
-        # make_rectangle(reachy, A, B, C, D, method, model, data, number_of_turns=1)
+        # make_rectangle(reachy, A, B, C, D, method, model, data, number_of_turns=1, nbr_points=50)
 
     elif method == "pink_sphere" : 
         print("Test pink with barrier sphere")
