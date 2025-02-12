@@ -3,9 +3,9 @@
 This directory contains several useful subdirectories and files:
 
 ## URDF Files
-📂 **`urdf/ (with the associated meshes/ directory)`**
+📂 **`urdf/`**
 
-Contains **`reachy.urdf`** and **`head.urdf`**, which are converted from the original **`reachy.urdf.xacro`** and **`head.urdf.xacro`** files.
+Contains **`reachy.urdf`**, which is converted from the original **`reachy.urdf.xacro`** file.
 ## Metrics and Analysis
 📂 **`csv_files_for_metrics/`**
 
