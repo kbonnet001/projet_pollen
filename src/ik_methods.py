@@ -98,17 +98,6 @@ def symbolic_inverse_kinematics_continuous_with_pinocchio(
     
     return q.tolist()
 
-def sigmoid(max, seuil, stretch, x): return max/(1+np.exp(-(x-seuil)/stretch))
-#La fonction sigmoid est une fonction d'activation étant égale  
-def softplus(beta, seuil, x): return 1/beta*np.log(1+np.exp(beta*(x-seuil)))
-
-def control_function(current_joint, activated):
-    diff_joints = np.abs(current_joint)
-    if activated: 
-        return sigmoid(2, np.pi/2, 1, diff_joints)
-    else: 
-        return sigmoid(2, 5*np.pi, np.pi, diff_joints)
-
 def symbolic_inverse_kinematics_continuous_with_pink(
         model:pin.Model, 
         data:pin.Data, 
@@ -247,16 +236,37 @@ def symbolic_inverse_kinematics_continuous_with_pink_sphere(
 
 #################################################################################################################################
 
+def sigmoid(max, seuil, stretch, x): return max/(1+np.exp(-(x-seuil)/stretch))
+
+def zero_posture_cost(current_joints, blocked_joints, activated=None):
+
+    zero_posture_cost = np.ones(27)*10e-2
+
+    for i in blocked_joints:
+        zero_posture_cost[i] = 1
+
+    # # Work in progress
+    # # Cette partie permettrai d'avoir une fonction d'activation obligeant le robot à se rembobiner
+    # # Cependant, il faudrait revoir la bonne correspondance des courbes avec les poids souhaités
+    # # Ainsi que l'implémentation de la variable activated qui indiquerai si une des articulations a été récemment proches de ses limites
+
+    # for i in [0, 2, 6, 15, 17, 21]:
+    #     if activated[i]: 
+    #         zero_posture_cost[i] += sigmoid(1, np.pi/2, 1, np.abs(current_joints[i]))
+    #     else: 
+    #         zero_posture_cost[i] += sigmoid(1, 5*np.pi, np.pi, np.abs(current_joints[i]))
+    
+    return zero_posture_cost
+
 def symbolic_inverse_kinematics_continuous_with_pink_V2(
         model:pin.Model, 
         data:pin.Data, 
         current_joints:np.array, 
         goal_poses, 
         d_min = 0.2,
-        rewind: bool=False,
         debug: bool=False, 
         plot:bool=False,
-        blocked_joints: np.array = None,
+        blocked_joints: np.array = [],
         csv_filename = "/home/reachy/dev/reachy2_symbolic_ik/src/reachy2_symbolic_ik/csv_files_for_metrics.py/pink_sphere/metrics_pink_sphere.csv"
         ):
 
@@ -274,7 +284,7 @@ def symbolic_inverse_kinematics_continuous_with_pink_V2(
 
     # Création des tâches pour chaque bras
 
-    base_ratio = 10e-3
+    base_ratio = 5*10e-4
 
     r_ee_task = pink.tasks.FrameTask(
             "r_wrist_yaw",
@@ -296,7 +306,7 @@ def symbolic_inverse_kinematics_continuous_with_pink_V2(
 
     # r_elbow_task = pink.tasks.FrameTask(
     #         "r_elbow_yaw",
-    #         position_cost= 2*10e-4,
+    #         position_cost= 2*10e-5,
     #         orientation_cost=10e-12,  # [cost] / [rad]
     #         lm_damping = 10e-7
     #     )  
@@ -304,24 +314,17 @@ def symbolic_inverse_kinematics_continuous_with_pink_V2(
 
     # Ajouter une posture pour stabiliser le mouvement
     posture_task = pink.tasks.PostureTask(
-            cost= 2 * 10e-5 # [cost] / [rad] 
+            cost= 2 * 10e-6 # [cost] / [rad] 
     )
     posture_task.set_target_from_configuration(config)
 
-    cost_zero_posture = control_function(current_joints[0], rewind)
-    # zero_posture = pink.tasks.PostureTask(
-    #     #cost = cost_zero_posture
-    #     cost = [10, 0, 10, 10, 10, 10, 10]
-    # )
-    # zero_posture.set_target(np.zeros(27))
-
-    if cost_zero_posture > 1.5:
-        rewind = True
-    else :
-        rewind = False
+    posture_zero_task = pink.tasks.PostureTask(
+        cost = zero_posture_cost(current_joints, blocked_joints)
+    )
+    posture_zero_task.set_target(np.zeros(27))
 
     damping_task = pink.tasks.DampingTask( 
-        cost = 2 * 10e-6
+        cost = 2 * 10e-7
         #cost = 10e-2
     )
 
@@ -329,7 +332,7 @@ def symbolic_inverse_kinematics_continuous_with_pink_V2(
     ee_barrier = pink.barriers.BodySphericalBarrier(
         ("l_wrist_yaw", "r_wrist_yaw"),
         d_min= d_min,
-        gain=100.0,
+        gain=10.0,
         safe_displacement_gain=1.0,
     )
 
@@ -340,7 +343,7 @@ def symbolic_inverse_kinematics_continuous_with_pink_V2(
     a_limit = pink.limits.AccelerationLimit(model, np.ones(27)*100)
 
     # Regrouper toutes les tâches
-    tasks = [l_ee_task, r_ee_task, damping_task, posture_task]
+    tasks = [l_ee_task, r_ee_task, damping_task, posture_task, posture_zero_task]
     barriers = [ee_barrier]
     limits=[q_limit, v_limit, a_limit]
 

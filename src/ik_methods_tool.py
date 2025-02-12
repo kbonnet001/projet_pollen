@@ -89,7 +89,7 @@ def load_models(method, arm = ["l", "r"]) :
         for prefix in arm : 
             model[prefix], data[prefix] = reduce_model_pin_arm(prefix)
 
-    elif method == "pink V2" : 
+    elif method == "pink_V2" : 
         model, _, _ = pin.buildModelsFromUrdf(abspath(path_urdf))
         data = model.createData()
 
@@ -149,7 +149,7 @@ def get_current_joints(reachy: ReachySDK, prefix : str="all") :
         ])
 
 
-def get_joints_from_chosen_method(reachy: ReachySDK, model, data, H_THd, prefix, method, d_min=0.20, blocked_joints=None):
+def get_joints_from_chosen_method(reachy: ReachySDK, model, data, H_THd, prefix, method, d_min=0.20, blocked_joints=[]):
 
     plot = True
     debug = False
@@ -213,7 +213,7 @@ def get_joints_from_chosen_method(reachy: ReachySDK, model, data, H_THd, prefix,
         current_joints_rad = np.deg2rad(get_current_joints(reachy, prefix))
         joint_rad = ik_methods.symbolic_inverse_kinematics_continuous_with_pink(model, data, current_joints_rad, H_WPd, 
                                                                     prefix, plot=False, debug=False)
-    elif method == "pink V2" : 
+    elif method == "pink_V2" : 
 
         goal_poses = []
         for pose in H_THd : # on peut faire rapide
