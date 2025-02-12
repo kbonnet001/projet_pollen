@@ -1,9 +1,11 @@
 # 📖 Developer documentation
 
+{path} correspond to the localisation where the folder projet_pollen has been installed. Our recommanded installation location is "/home/reachy/dev/reachy2_symbolic_ik/src"
+
 ## Function Testing
 To test the implemented functions, a set of test functions is included in:
 
-📂 **`/home/reachy/dev/reachy2_symbolic_ik/src/example/test_movement_test.py`**
+📂 **`{path}/projet_pollen/src/test_movement_test.py`**
 
 This file, largely inspired by **`movement_test.py`**, includes:
 
@@ -11,7 +13,7 @@ This file, largely inspired by **`movement_test.py`**, includes:
 **`make_spiral`**: Create a spiral with an increasing radius with Reachy's hand.
 **`move_q`**: Give goal_position according to a movement Reachy could do by using only the selected q. (Attention: if the other joints aren't blocked in place with the variable blocked_joints, they will move to reach the end_goal, preventing the robot to move only the desired joints.)
 
-To acccomplish those tasks, this file will call the 📂 **`/home/reachy/dev/reachy2_symbolic_ik/src/reachy2_symbolic_ik/ik_methods_tool.py`** file.
+To acccomplish those tasks, this file will call the 📂 **`{path}/projet_pollen/ik_methods_tool.py`** file.
 This file contain function to communicate and simplify the use of various ik methods, by including :
 
 **`load_model`**: Loads the required URDF model for Pinocchio or Pink.
@@ -20,7 +22,7 @@ This file contain function to communicate and simplify the use of various ik met
 
 
 ## Inverse Kinematics Methods
-📂 **`/home/reachy/dev/reachy2_symbolic_ik/src/reachy2_symbolic_ik/ik_methods.py`**
+📂 **`{path}/projet_pollen/ik_methods.py`**
 
 This file contains the programmed inverse kinematics functions for Pinocchio and Pin. The functions below may eventually replace symbolic_inverse_kinematics_continuous in:
 
