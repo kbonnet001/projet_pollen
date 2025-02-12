@@ -438,7 +438,7 @@ def plot_all(method, path):
 
 ##################
 ##################
-method = "pollen"
+method = "pink_V2"
 path = f"/home/reachy/dev/reachy2_symbolic_ik/src/reachy2_symbolic_ik/csv_files_for_metrics/{method}"
 plot_all(method, path) 
 

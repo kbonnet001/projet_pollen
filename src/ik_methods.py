@@ -43,7 +43,6 @@ def symbolic_inverse_kinematics_continuous_with_pinocchio(
         prefix,
         plot = True,
         debug: bool=False,
-        csv_filename = projet_pollen_folder_path + "projet_pollen/assets/csv_files_for_metrics.py/pinocchio/metrics_pinocchio_{prefix}.csv"
         ):
 
     if debug : 
@@ -131,6 +130,12 @@ def symbolic_inverse_kinematics_continuous_with_pink(
             cost=1e-3,  # [cost] / [rad]
     )
     
+    # model.velocityLimit = np.ones(7)*100
+
+    # q_limit = pink.limits.ConfigurationLimit(model, config_limit_gain=0.6)
+    # v_limit = pink.limits.VelocityLimit(model)
+    # a_limit = pink.limits.AccelerationLimit(model, np.ones(7)*100)
+
     # Ajout des tâches et barrières
     tasks = [end_effector_task, posture_task]
 
@@ -210,7 +215,6 @@ def symbolic_inverse_kinematics_continuous_with_pink_sphere(
     # Solveur QP
     dt = 1e-2
     velocity = pink.solve_ik(config, tasks, dt, solver=solver, barriers=barriers)
-    input(f"velocity = {velocity}")
 
     # Mise à jour de la config
     config.integrate_inplace(velocity, dt)
@@ -362,7 +366,7 @@ def symbolic_inverse_kinematics_continuous_with_pink_V2(
         barriers=barriers,
         limits=limits,
         damping=10e-8, 
-        safety_break=True)
+        safety_break=True) #original True
     
     #input(f"velocity = {velocity}")
 
@@ -383,8 +387,8 @@ def symbolic_inverse_kinematics_continuous_with_pink_V2(
         pose_compute_r_world = config.get_transform(f"r_wrist_yaw", "world")
         pose_compute_r_torso = np.dot(np.dot(np.linalg.inv(H_WT), pose_compute_r_world), np.linalg.inv(H_HP))
 
-        compute_metrics(goal_pose_torso_l, current_joints[:7], "l", "pink_sphere", config.q[:7], pose_compute_l_torso, velocity = velocity[:7])
-        compute_metrics(goal_pose_torso_r, current_joints[15:22], "r", "pink_sphere", config.q[15:22], pose_compute_r_torso, velocity = velocity[15:22])
+        compute_metrics(goal_pose_torso_l, current_joints[:7], "l", "pink_V2", config.q[:7], pose_compute_l_torso, velocity = velocity[:7])
+        compute_metrics(goal_pose_torso_r, current_joints[15:22], "r", "pink_V2", config.q[15:22], pose_compute_r_torso, velocity = velocity[15:22])
 
     q = config.q
     return q[:7], q[15:22]

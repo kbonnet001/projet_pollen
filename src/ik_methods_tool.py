@@ -89,7 +89,7 @@ def load_models(method, arm = ["l", "r"]) :
         for prefix in arm : 
             model[prefix], data[prefix] = reduce_model_pin_arm(prefix)
 
-    elif method == "pink_V2" : 
+    elif method == "pink_V2" or method == "pink_sphere": 
         model, _, _ = pin.buildModelsFromUrdf(abspath(path_urdf))
         data = model.createData()
 
@@ -164,24 +164,9 @@ def get_joints_from_chosen_method(reachy: ReachySDK, model, data, H_THd, prefix,
     wrist_roll = [- np.pi/6, np.pi/6 ]
     wrist_pitch = [- np.pi/6, np.pi/6 ]
     wrist_yaw = [ -6*np.pi, 6*np.pi ]
-
-
-    if prefix !="all":
-        if prefix == "r":
-            shoulder_roll =  shoulder_roll_r
-        elif prefix == "l":
-            shoulder_roll =  shoulder_roll_l
-
-        modify_joint_limit(model, indices=np.array([0, 1, 2, 3, 4, 5, 6]), margin=margin, values = np.array([
-            shoulder_pitch, 
-            shoulder_roll, 
-            elbow_yaw, 
-            elbow_pitch, 
-            wrist_roll, 
-            wrist_pitch, 
-            wrist_yaw]))
+        
     
-    else:
+    if prefix == "all" and method =="pink_V2":
         modify_joint_limit(model, indices=np.array([0, 1, 2, 3, 4, 5, 6, 15, 16, 17, 18, 19, 20, 21]), margin=margin, values = np.array([
             shoulder_pitch, 
             shoulder_roll_l, 
@@ -198,6 +183,21 @@ def get_joints_from_chosen_method(reachy: ReachySDK, model, data, H_THd, prefix,
             wrist_roll, 
             wrist_pitch, 
             wrist_yaw]))
+    
+    # else : # prefix !="all"
+        # if prefix == "r":
+        #     shoulder_roll =  shoulder_roll_r
+        # elif prefix == "l":
+        #     shoulder_roll =  shoulder_roll_l
+
+        # modify_joint_limit(model, indices=np.array([0, 1, 2, 3, 4, 5, 6]), margin=margin, values = np.array([
+        #     shoulder_pitch, 
+        #     shoulder_roll, 
+        #     elbow_yaw, 
+        #     elbow_pitch, 
+        #     wrist_roll, 
+        #     wrist_pitch, 
+        #     wrist_yaw]))
 
     if method == "pin" or method == "pinocchio" :
 
@@ -213,6 +213,16 @@ def get_joints_from_chosen_method(reachy: ReachySDK, model, data, H_THd, prefix,
         current_joints_rad = np.deg2rad(get_current_joints(reachy, prefix))
         joint_rad = ik_methods.symbolic_inverse_kinematics_continuous_with_pink(model, data, current_joints_rad, H_WPd, 
                                                                     prefix, plot=plot, debug=debug)
+    
+    elif method == "pink_sphere" : 
+
+        goal_poses = []
+        
+        for pose in H_THd : # on peut faire rapide
+            goal_poses.append(np.dot(np.dot(H_WT, pose), H_HP))
+        current_joints_rad = np.deg2rad(get_current_joints(reachy))
+        joint_rad = ik_methods.symbolic_inverse_kinematics_continuous_with_pink_sphere(model, data, current_joints_rad, goal_poses, 
+                                                                    debug=debug, plot=plot, d_min = d_min, )
     elif method == "pink_V2" : 
 
         goal_poses = []

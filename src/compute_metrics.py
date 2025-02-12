@@ -12,7 +12,7 @@ def compute_metrics(goal_pose, current_joints, prefix, method, q_compute, poses_
     """
     Calcule les écarts de position, rotation et angles des articulations pour différentes méthodes (Pink, Pinocchio, etc.).
     """
-    csv_filename = f"/home/reachy/dev/reachy2_symbolic_ik/src/reachy2_symbolic_ik/csv_files_for_metrics.py/{method}/metrics_{method}_{prefix}.csv"
+    csv_filename = f"/home/reachy/dev/reachy2_symbolic_ik/src/reachy2_symbolic_ik/csv_files_for_metrics/{method}/metrics_{method}_{prefix}.csv"
 
     ecart_q = np.abs(np.array(current_joints) - np.array(q_compute))
 
