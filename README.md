@@ -20,6 +20,7 @@ The Pinocchio and Pink libraries are used to carry out this work. Among the prop
 * **Launch instructions**:
 
 To launch the programm, the git must first be installed in Reachy stack, to a path of your choice. Our recommandation is to install it in "/home/reachy/dev/reachy2_symbolic_ik/src" where the original control_ik function is located. If the path is modified, change it accordingly in the variable projet_pollen_folder_path in the file src/ik_methods.py.
+📂 assets/urdf/reachy.urdf doit être mis dans le dossier 📂 /home/reachy/reachy_ws/src/reachy2_core/reachy_description/urdf/ pour une bonne intégration avec le reste du code.
 
 Reachy must first be launched and when it is ready to start, it can be launched using the command line "python3  {path}/projet_pollen/src/test_movement_test.py" with {path} the previous path where you installed the projet_pollen folder. 
 
