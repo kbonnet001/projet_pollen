@@ -20,6 +20,7 @@ This file contains the programmed inverse kinematics functions for Pinocchio and
 **`symbolic_inverse_kinematics_continuous_with_pinocchio`**: Solves inverse kinematics using Pinocchio, without constraint handling.
 **`symbolic_inverse_kinematics_continuous_with_pink`**: Solves inverse kinematics using the QP method with Pink.
 **`symbolic_inverse_kinematics_continuous_with_pink_sphere`**: Solves inverse kinematics using the QP method with Pink, integrating spherical barriers at the end-effectors.
+**`symbolic_inverse_kinematics_continuous_with_pink_V2`**: Solves inverse kinematics using the QP method with Pink, integrating both the previous spherical barriers and some other modification like correcting the joint and velocity constraint.
 ## Metrics and Visualization
 These functions utilize:
 
