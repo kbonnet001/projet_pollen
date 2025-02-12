@@ -10,10 +10,18 @@ The Pinocchio and Pink libraries are used to carry out this work. Among the prop
 
 ## 🚀 Quickstart
 
-* **Install instructions**: List of software/hardware dependencies, and instructions to install them if relevant
-* **Launch instructions**: Few lines of code to launch the main feature of your project
+* **Install instructions**:
+    *  Requirement :
+          *  pinocchio : https://stack-of-tasks.github.io/pinocchio/download.html
+          *  pink : https://github.com/stephane-caron/pink
+          *  qpsolvers : https://qpsolvers.github.io/qpsolvers/installation.html
+    
+⚠️ : Those installation could change the current version of numpy
+* **Launch instructions**:
 
-If this is written in user or dev docs, provide links.
+To launch the programm, the git must first be installed in Reachy stack, to a path of your choice. Our recommandation is to install it in "/home/reachy/dev/reachy2_symbolic_ik/src" where the original control_ik function is located. If the path is modified, change it accordingly in the variable projet_pollen_folder_path in the file src/ik_methods.py.
+
+Reachy must first be launched and when it is ready to start, it can be launched using the command line "python3  {path}/projet_pollen/src/test_movement_test.py" with {path} the previous path where you installed the projet_pollen folder. 
 
 ## 🔍 About this project
 

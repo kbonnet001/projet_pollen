@@ -33,9 +33,12 @@ This approach serves as an intermediate step before integrating a quadratic prog
 
 Based on this foundation, additional constraints can be introduced, such as barriers or limits. A first proposal is to [add spherical barriers](https://stephane-caron.github.io/pink/barriers.html#module-pink.barriers.body_spherical_barrier) around the arm end-effectors to ensure a minimum distance between them and prevent collisions.
 
-iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
-Guillaume + 
-iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
+The joint and velocity limitation were also modified to take Reachy limitation into account and an acceleration limitation was implemented to prevent Reachy's end effector to have high speed movement on very short time, often resulting in end effector tremors.
+
+A subtask has also been implemented to minimize the joint angle, it allow reachy to prefer movement that are far from its joints limits. 
+This subtask can also be used to block selected joints if necessary like, for example, if only a selected joint is wanted, to move, other joints is prefered to be blocked.
+
+This subtask could also have room for improvement to allow some highly movable joint like the shoulder pitch, the elbow yaw or the wrist yaw to conserve their full possible rotation while also rewinding the joint if it is about to hit its joint limit. 
 
 
 ### Results
@@ -57,7 +60,7 @@ This approach performs significantly better, managing to follow the dynamic refe
 More graphics for this method are available [in this folder](../../assets/csv_files_for_metrics/pink).
 
 #### Pink and Body Spherical barrier
-One possible approach is to integrate spherical barriers at the end-effectors.![In this test](../../assets/other_files/pink_sphere.mp4) , the hands are required to position themselves at the center of the torso, with a maximum deviation of 0.05 m. With the barrier in place, where d_min = 0.2 m, the hands do not collide.
+One possible approach is to integrate spherical barriers at the end-effectors. ![In this test](../../assets/other_files/pink_sphere.mp4), the hands are required to position themselves at the center of the torso, with a maximum deviation of 0.05 m. With the barrier in place, where d_min = 0.2 m, the hands do not collide.
 This contrasts with the current Pollen implementation, which stops the program and returns an error in such a situation.
 
 ![plot_draw_sphere](../../assets/csv_files_for_metrics/pink_sphere/pink_sphere_plot_translation_draw.png)
