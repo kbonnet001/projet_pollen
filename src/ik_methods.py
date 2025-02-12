@@ -170,7 +170,6 @@ def symbolic_inverse_kinematics_continuous_with_pink_sphere(
         q,
         goal_poses,
         solver="osqp", d_min = 0.2, plot=False, debug=False, 
-        csv_filename = projet_pollen_folder_path + "projet_pollen/assets/csv_files_for_metrics.py/pink_sphere/metrics_pink_sphere.csv"
         ):
 
     if debug:
@@ -269,7 +268,6 @@ def symbolic_inverse_kinematics_continuous_with_pink_V2(
         debug: bool=False, 
         plot:bool=False,
         blocked_joints: np.array = [],
-        csv_filename = projet_pollen_folder_path + "projet_pollen/assets/csv_files_for_metrics.py/pink_sphere/metrics_pink_sphere.csv"
         ):
 
     if debug : 

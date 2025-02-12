@@ -205,14 +205,14 @@ def get_joints_from_chosen_method(reachy: ReachySDK, model, data, H_THd, prefix,
         H_WPd = np.dot(np.dot(H_WT, H_THd), H_HP)
         current_joints_rad = np.deg2rad(get_current_joints(reachy, prefix))
         joint_rad= ik_methods.symbolic_inverse_kinematics_continuous_with_pinocchio(model, data, current_joints_rad, H_WPd, H_WPd[0:3,0:3], 
-                                                                    debug=False, plot=False)
+                                                                    debug=debug, plot=plot)
     elif method == "pink" : 
 
         # on change goal pose avant de la donner
         H_WPd = np.dot(np.dot(H_WT, H_THd), H_HP)
         current_joints_rad = np.deg2rad(get_current_joints(reachy, prefix))
         joint_rad = ik_methods.symbolic_inverse_kinematics_continuous_with_pink(model, data, current_joints_rad, H_WPd, 
-                                                                    prefix, plot=False, debug=False)
+                                                                    prefix, plot=plot, debug=debug)
     elif method == "pink_V2" : 
 
         goal_poses = []
@@ -221,7 +221,7 @@ def get_joints_from_chosen_method(reachy: ReachySDK, model, data, H_THd, prefix,
 
         current_joints_rad = np.deg2rad(get_current_joints(reachy))
         joint_rad = ik_methods.symbolic_inverse_kinematics_continuous_with_pink_V2(model, data, current_joints_rad, goal_poses, 
-                                                                    debug=False, plot=False, d_min = d_min, blocked_joints=blocked_joints)
+                                                                    debug=debug, plot=plot, d_min = d_min, blocked_joints=blocked_joints)
         
     else : 
         raise ValueError(f"'{method}' is not a valid method.")

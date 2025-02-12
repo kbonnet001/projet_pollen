@@ -231,25 +231,23 @@ def test_sphere(
     
     orientation = [0, -np.pi / 2, 0] # orientation
 
-    A = np.array([0.4, -0.5, -0.2]) 
-    B = np.array([0.4, -0.01, -0.2]) # on va sur le centre de torse, les deux mains
-    C = np.array([0.4, -0.5, 0.1]) 
-    D = np.array([0.4, -0.01, -0.1]) 
+    A = np.array([0.4, -0.5, -0.3]) 
+    B = np.array([0.4, -0.01, -0.3]) # on va sur le centre de torse, les deux mains
+
+    C = np.array([0.4, -0.01, -0.1])
+    D = np.array([0.4, -0.5, -0.1])
+
 
     # Go to the firt point A (pollen)
-    move_to_first_point(reachy, orientation, A, "r")
-    move_to_first_point(reachy, orientation, np.array([A[0], -A[1], A[2]]), "l")
+    move_to_first_point(reachy, orientation, A, "r_arm")
+    move_to_first_point(reachy, orientation, np.array([A[0], -A[1], A[2]]), "l_arm")
     time.sleep(2)
 
     make_line(reachy, np.array([A, orientation]), np.array([B, orientation]), method, model, data, nbr_points)
     time.sleep(3)
-    make_line(reachy, np.array([B, orientation]), np.array([A, orientation]), method, model, data, nbr_points)
-    time.sleep(3)
-    make_line(reachy, np.array([A, orientation]), np.array([C, orientation]), method, model, data, nbr_points)
+    make_line(reachy, np.array([B, orientation]), np.array([C, orientation]), method, model, data, nbr_points)
     time.sleep(3)
     make_line(reachy, np.array([C, orientation]), np.array([D, orientation]), method, model, data, nbr_points)
-    time.sleep(3)
-    make_line(reachy, np.array([D, orientation]), np.array([C, orientation]), method, model, data, nbr_points)
     time.sleep(3)
 
 

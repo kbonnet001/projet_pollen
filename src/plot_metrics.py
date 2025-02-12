@@ -55,9 +55,9 @@ def plot_q(path, df, method):
     ecart_r_cols = [col for col in df.columns if col.startswith("q_r")]
 
     # Definition of ticks in rad
-    radian_ticks = np.array([-np.pi/2, -np.pi/4, 0, np.pi/4, np.pi/2])
-    radian_labels = [r"$-\frac{\pi}{2}$", r"$-\frac{\pi}{4}$", "0", 
-                     r"$\frac{\pi}{4}$", r"$\frac{\pi}{2}$"]
+    radian_ticks = np.array([-np.pi, -np.pi/2, -np.pi/4, 0, np.pi/4, np.pi/2, np.pi])
+    radian_labels = [r"$-\pi$", r"$-\frac{\pi}{2}$", r"$-\frac{\pi}{4}$", "0", 
+                     r"$\frac{\pi}{4}$", r"$\frac{\pi}{2}$", r"$\pi$"]
 
     def add_secondary_y_axis(ax):
         ax2 = ax.twinx()
@@ -109,9 +109,9 @@ def plot_velocity(path, df, method):
     ecart_r_cols = [col for col in df.columns if col.startswith("velocity_r")]
 
     # Definition of ticks in rad
-    radian_ticks = np.array([-np.pi/2, -np.pi/4, 0, np.pi/4, np.pi/2])
-    radian_labels = [r"$-\frac{\pi}{2}$", r"$-\frac{\pi}{4}$", "0", 
-                     r"$\frac{\pi}{4}$", r"$\frac{\pi}{2}$"]
+    radian_ticks = np.array([-np.pi, -np.pi/2, -np.pi/4, 0, np.pi/4, np.pi/2, np.pi])
+    radian_labels = [r"$-\pi$", r"$-\frac{\pi}{2}$", r"$-\frac{\pi}{4}$", "0", 
+                     r"$\frac{\pi}{4}$", r"$\frac{\pi}{2}$", r"$\pi$"]
 
     def add_secondary_y_axis(ax):
         ax2 = ax.twinx()
@@ -220,8 +220,8 @@ def plot_ecart_q(path, df, method, tolerance):
     ecart_r_cols = [col for col in df.columns if col.startswith("ecart_q_r")]
 
     # Definition of ticks in rad
-    radian_ticks = np.array([0, np.pi/12, np.pi/6, np.pi/4])
-    radian_labels = ["0", r"$\frac{\pi}{12}$", r"$\frac{\pi}{6}$", r"$\frac{\pi}{4}$"]
+    radian_ticks = np.array([0, np.pi/12, np.pi/6, np.pi/4, np.pi/2])
+    radian_labels = ["0", r"$\frac{\pi}{12}$", r"$\frac{\pi}{6}$", r"$\frac{\pi}{4}$", r"$\frac{\pi}{2}$"]
 
     def add_secondary_y_axis(ax):
         ax2 = ax.twinx()
@@ -294,8 +294,8 @@ def plot_ecart_pos_rot(path, df, method):
     ax1.set_title("Rotational Error")
     
     # Set Y-ticks in fractions of π
-    radian_ticks = np.array([0, 15, 30])  # Degrees
-    radian_labels = ["0", r"$\frac{\pi}{12}$", r"$\frac{\pi}{6}$"]
+    radian_ticks = np.array([0, np.pi/12, np.pi/6, np.pi/4, np.pi/3, np.pi/2])  # Degrees
+    radian_labels = ["0", r"$\frac{\pi}{12}$", r"$\frac{\pi}{6}$", r"$\frac{\pi}{4}$", r"$\frac{\pi}{3}$", r"$\frac{\pi}{2}$"]
     ax1.set_yticks(np.radians(radian_ticks))
     ax1.set_yticklabels(radian_labels)
     
@@ -419,7 +419,7 @@ def plot_all(method, path):
     # Load data from CSV
     df = pd.read_csv(os.path.join(path, csv_filename))
 
-    path_pollen = f"/home/reachy/dev/reachy2_symbolic_ik/src/reachy2_symbolic_ik/csv_files_for_metrics.py/pollen"
+    path_pollen = f"/home/reachy/dev/reachy2_symbolic_ik/src/reachy2_symbolic_ik/csv_files_for_metrics/pollen"
     if os.path.exists(os.path.join(path_pollen, f"metrics_pollen_l.csv")) and os.path.exists(os.path.join(path_pollen, f"metrics_pollen_r.csv")) : 
         
         csv_filename_pollen = f"metrics_pollen.csv"
@@ -428,16 +428,18 @@ def plot_all(method, path):
 
     # Generate and save various plots
     plot_q(path, df, method)
-    plot_velocity(path, df, method)
-    plot_velocity_std(path, df, method)
+    if method!= "pollen" : 
+        plot_velocity(path, df, method)
+        plot_velocity_std(path, df, method)
+    
     plot_ecart_q(path, df, method, tolerance=0.8)
     plot_ecart_pos_rot(path, df, method)
-    plot_translations_and_draw(path, df, method, plot_goal=True, plot_pollen=True, df_pollen=df_pollen)
+    plot_translations_and_draw(path, df, method, plot_goal=True, plot_pollen=False, df_pollen=df_pollen)
 
 ##################
 ##################
-method = "pink_sphere"
-path = f"/home/reachy/dev/reachy2_symbolic_ik/src/reachy2_symbolic_ik/csv_files_for_metrics.py/{method}"
+method = "pollen"
+path = f"/home/reachy/dev/reachy2_symbolic_ik/src/reachy2_symbolic_ik/csv_files_for_metrics/{method}"
 plot_all(method, path) 
 
 
