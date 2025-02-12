@@ -30,6 +30,8 @@ H_HP = np.array([
     [0.000, 0.000, 1.000, 0.100],
     [0.000, 0.000, 0.000, 1.000],
 ])
+
+projet_pollen_folder_path = "/home/reachy/dev/reachy2_symbolic_ik/src"
     
 #############################################################################
 
@@ -41,7 +43,7 @@ def symbolic_inverse_kinematics_continuous_with_pinocchio(
         prefix,
         plot = True,
         debug: bool=False,
-        csv_filename = "/home/reachy/dev/reachy2_symbolic_ik/src/reachy2_symbolic_ik/csv_files_for_metrics.py/pinocchio/metrics_pinocchio_{prefix}.csv"
+        csv_filename = projet_pollen_folder_path + "projet_pollen/assets/csv_files_for_metrics.py/pinocchio/metrics_pinocchio_{prefix}.csv"
         ):
 
     if debug : 
@@ -168,7 +170,7 @@ def symbolic_inverse_kinematics_continuous_with_pink_sphere(
         q,
         goal_poses,
         solver="osqp", d_min = 0.2, plot=False, debug=False, 
-        csv_filename = "/home/reachy/dev/reachy2_symbolic_ik/src/reachy2_symbolic_ik/csv_files_for_metrics.py/pink_sphere/metrics_pink_sphere.csv"
+        csv_filename = projet_pollen_folder_path + "projet_pollen/assets/csv_files_for_metrics.py/pink_sphere/metrics_pink_sphere.csv"
         ):
 
     if debug:
@@ -267,7 +269,7 @@ def symbolic_inverse_kinematics_continuous_with_pink_V2(
         debug: bool=False, 
         plot:bool=False,
         blocked_joints: np.array = [],
-        csv_filename = "/home/reachy/dev/reachy2_symbolic_ik/src/reachy2_symbolic_ik/csv_files_for_metrics.py/pink_sphere/metrics_pink_sphere.csv"
+        csv_filename = projet_pollen_folder_path + "projet_pollen/assets/csv_files_for_metrics.py/pink_sphere/metrics_pink_sphere.csv"
         ):
 
     if debug : 

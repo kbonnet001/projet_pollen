@@ -27,7 +27,7 @@ H_HP = np.array([
 
 def reduce_model_pin_arm(
         prefix: str, 
-        urdf_filename: str = "/home/reachy/reachy_ws/src/reachy2_core/reachy_description/urdf/reachy.urdf",
+        urdf_filename: str = ik_methods.projet_pollen_folder_path + "/projet_pollen/assets/urdf/reachy.urdf",
         debug: bool = True
         )-> pin.Model:
     """
@@ -80,7 +80,7 @@ def reduce_model_pin_arm(
 
 def load_models(method, arm = ["l", "r"]) : 
 
-    path_urdf = "/home/reachy/reachy_ws/src/reachy2_core/reachy_description/urdf/reachy.urdf"
+    path_urdf = ik_methods.projet_pollen_folder_path + "/projet_pollen/assets/urdf/reachy.urdf"
 
     model = {}
     data = {}
