@@ -14,10 +14,10 @@ import os
 PLOT = False
 
 def go_to_pose(reachy: ReachySDK, pose: npt.NDArray[np.float64], prefix: str, method:str, 
-               model, data) -> None:
+               model, data, blocked_joints=[]) -> None:
 
     if method == "pink_V2" or method =="pink_sphere": 
-        ik = get_joints_from_chosen_method(reachy, model, data, pose, "all", method)
+        ik = get_joints_from_chosen_method(reachy, model, data, pose, "all", method, blocked_joints=blocked_joints)
         
         for joint, goal_pos in zip(reachy.l_arm.joints.values(), ik[0]):
             
@@ -343,27 +343,29 @@ data,
 reachy : ReachySDK,
 indices : np.array,
 new_q : np.array,
-prefix : str
+prefix : str,
+method: str
 ) -> None:
     new_joints = get_current_joints(reachy, prefix)
+    blocked_joints = [i for i in range (len(new_joints))]
     j=0
     for i in indices:
-        new_joints[i] =  new_q[j]
+        new_joints[i] = new_q[j]
+        blocked_joints.pop(i-j)
         #print(f"new_joint {i}= {int(new_joints[i])}")
         j+=1
 
-    if prefix != "all":
-        reachy_arm = getattr(reachy, f"{prefix}_arm")
-        pose = reachy_arm.forward_kinematics(new_joints)
-    
-    else:
+    if prefix == "all":
         l_pose = reachy.l_arm.forward_kinematics(new_joints[:7])
         r_pose = reachy.r_arm.forward_kinematics(new_joints[15:22])
         pose = [l_pose, r_pose]
+    else:
+        reachy_arm = getattr(reachy, f"{prefix}_arm")
+        pose = reachy_arm.forward_kinematics(new_joints)
 
 
-    go_to_pose(reachy, np.array(pose), prefix, "pink", model, data)
-    time.sleep(0.001)
+    go_to_pose(reachy, np.array(pose), prefix, method, model, data, blocked_joints=blocked_joints)
+    time.sleep(0.01)
 
 ##########################################
 
@@ -408,12 +410,29 @@ def main_test() -> None:
         # print("Test pink with barrier sphere")
         # test_sphere(reachy, method, model, data, nbr_points = 50)
 
-        print("making a spiral")
-        center = np.array([0.4, -0.4, -0.2])
-        orientation = np.array([0, -np.pi / 2, 0])
-        min_radius = 0.1
-        max_radius = 1
-        make_spiral(model, data, reachy, "pink_V2", center, orientation, min_radius, max_radius, number_of_turns=5)
+        print("test des q")
+        for i in range (200):
+            q = np.ones(2)*i
+            move_q(model, data, reachy, [1, 16], q, "all", method)
+            real_q=get_current_joints(reachy)
+            real_q_indices = np.array([real_q[1], real_q[16]])
+            print("q= ", q)
+            print("real q = ", real_q)
+            print("diff_q = ", q - real_q_indices)
+
+        for i in range (400):
+            q = np.ones(2)*(200 - i)
+            move_q(model, data, reachy, [1, 16], q, "all", method)
+
+        print("test q fini")
+        time.sleep(1)
+
+        # print("making a spiral")
+        # center = np.array([0.4, -0.4, -0.2])
+        # orientation = np.array([0, -np.pi / 2, 0])
+        # min_radius = 0.1
+        # max_radius = 1
+        # make_spiral(model, data, reachy, "pink_V2", center, orientation, min_radius, max_radius, number_of_turns=5)
     #     ############
 
         # print("Making a rectangle (pink_V2)")

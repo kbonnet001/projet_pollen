@@ -248,7 +248,7 @@ def zero_posture_cost(current_joints, blocked_joints, activated=None):
     zero_posture_cost = np.ones(27)*10e-2
 
     for i in blocked_joints:
-        zero_posture_cost[i] = 1
+        zero_posture_cost[i] = 10
 
     # # Work in progress
     # # Cette partie permettrai d'avoir une fonction d'activation obligeant le robot à se rembobiner
