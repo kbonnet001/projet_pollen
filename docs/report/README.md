@@ -27,7 +27,7 @@ To address this challenge, we conducted a [state-of-the-art review](docs/bibliog
 
 ### Realisations 
 
-Following the results of the state of the art, an initial inverse kinematics solution was developed using the Jacobian-based iterative algorithm. This implementation is based on the Pinocchio library and is largely inspired by [this example from the official documentation](https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/md_doc_b_examples_d_inverse_kinematics.html).
+Following the results of the state of the art, an initial inverse kinematics solution was developed using the Jacobian-based iterative algorithm adpated to our case (performing only one iteration instead of full convergence). This implementation is based on the Pinocchio library and is largely inspired by [this example from the official documentation](https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/md_doc_b_examples_d_inverse_kinematics.html).
 
 This approach serves as an intermediate step before integrating a quadratic programming (QP) resolution and implementing constraints. To achieve this, the Pink library, built on Pinocchio, is used. It directly incorporates system limits by leveraging the robot's URDF model.
 
@@ -49,20 +49,46 @@ A first test involves asking Reachy2 to ![draw a rectangle](../../assets/other_f
 
 #### Pinocchio
 The resolution using Pinocchio delivers limited performance and fails to accurately follow the dynamic reference. This outcome was expected, as this method relies on iterative convergence, making it unsuitable for real-time teleoperation tasks.
+<p align="center">
+  <img src="../../assets/csv_files_for_metrics/pinocchio/pinocchio_plot_translations.png" width="45%" />
+  <img src="../../assets/csv_files_for_metrics/pinocchio/pinocchio_plot_movement_draw.png" width="45%" />
+</p>
 
-![plot_draw_pinocchio](../../assets/csv_files_for_metrics/pinocchio/pinocchio_plot_translation_draw.png)
 More graphics for this method are available [in this folder](../../assets/csv_files_for_metrics/pinocchio).
 
 #### Pink
 This approach performs significantly better, managing to follow the dynamic reference with some minor inaccuracies. While this iterative method cannot compete with the current analytical resolution used by Pollen, it stands out for its flexibility in integrating constraints.
+<p align="center">
+  <img src="../../assets/csv_files_for_metrics/pink/pink_plot_translations.png" width="45%" />
+  <img src="../../assets/csv_files_for_metrics/pink/pink_plot_movement_draw.png" width="45%" />
+</p>
 
-![plot_draw_pink](../../assets/csv_files_for_metrics/pink/pink_plot_translation_draw.png)
 More graphics for this method are available [in this folder](../../assets/csv_files_for_metrics/pink).
 
 #### Pink and Body Spherical barrier
 One possible approach is to integrate spherical barriers at the end-effectors. ![In this test](../../assets/other_files/pink_sphere.mp4), the hands are required to position themselves at the center of the torso, with a maximum deviation of 0.05 m. With the barrier in place, where d_min = 0.2 m, the hands do not collide.
 This contrasts with the current Pollen implementation, which stops the program and returns an error in such a situation.
+<p align="center">
+  <img src="../../assets/csv_files_for_metrics/pink_sphere/pink_sphere_plot_translations.png" width="45%" />
+  <img src="../../assets/csv_files_for_metrics/pink_sphere/pink_sphere_plot_movement_draw.png" width="45%" />
+</p>
+<p align="center">>
+  <img src="../../assets/csv_files_for_metrics/pink_sphere/pink_sphere_plot_distance_sphere.png", width="50%"/>
+</p>
 
-![plot_draw_sphere](../../assets/csv_files_for_metrics/pink_sphere/pink_sphere_plot_translation_draw.png)
-![plot_draw_sphere](../../assets/csv_files_for_metrics/pink_sphere/pink_sphere_plot_distance_sphere.png)
 More graphics for this method are available [in this folder](../../assets/csv_files_for_metrics/pink_sphere).
+
+#### Pink and Velocity Limits
+Then, it is possibe to add [Velocity Limits](https://stephane-caron.github.io/pink/limits.html#module-pink.limits.velocity_limit). It is possible to compare this pink_V2 method (right) with the first Pink approach mentioned earlier (left) and observe that this approach effectively limits the speed.
+<p align="center">
+  <img src="../../assets/csv_files_for_metrics/pink/pink_plot_velocity.png" width="45%" />
+  <img src="../../assets/csv_files_for_metrics/pink_V2_rectangle/pink_V2_plot_velocity.png" width="45%" />
+</p>
+
+More graphics for this method are available [in this folder](../../assets/csv_files_for_metrics/pink_V2_rectangle).
+
+
+
+
+
+
