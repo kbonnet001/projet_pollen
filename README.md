@@ -29,7 +29,7 @@ Reachy must first be launched and when it is ready to start, it can be launched 
 |       |        |
 |:----------------------------:|:-----------------------------------------------------------------------:|
 | 💼 **Client**                |  Rémi Fabre and Vincent Padois                                           |
-| 🔒 **Confidentiality**       | **Public** or **Private** *(1)*                                         |
+| 🔒 **Confidentiality**       | **Public**                                     |
 | ⚖️ **License**               |  [Choose a license](https://choosealicense.com/) *(1)*                  |
 | 👨‍👨‍👦 **Authors**               |  Kloé Bonnet and Guillaume Lauga    |
 
