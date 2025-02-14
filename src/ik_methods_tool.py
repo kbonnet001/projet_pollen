@@ -204,7 +204,7 @@ def get_joints_from_chosen_method(reachy: ReachySDK, model, data, H_THd, prefix,
         # on change goal pose avant de la donner
         H_WPd = np.dot(np.dot(H_WT, H_THd), H_HP)
         current_joints_rad = np.deg2rad(get_current_joints(reachy, prefix))
-        joint_rad= ik_methods.symbolic_inverse_kinematics_continuous_with_pinocchio(model, data, current_joints_rad, H_WPd, H_WPd[0:3,0:3], 
+        joint_rad= ik_methods.symbolic_inverse_kinematics_continuous_with_pinocchio(model, data, current_joints_rad, H_WPd, prefix, 
                                                                     debug=debug, plot=plot)
     elif method == "pink" : 
 

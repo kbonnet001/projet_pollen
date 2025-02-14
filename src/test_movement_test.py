@@ -11,7 +11,7 @@ from ik_methods_tool import get_joints_from_chosen_method, load_models, get_curr
 from compute_metrics import compute_metrics
 import os 
 
-PLOT = False
+PLOT = True
 
 def go_to_pose(reachy: ReachySDK, pose: npt.NDArray[np.float64], prefix: str, method:str, 
                model, data, blocked_joints=[]) -> None:
@@ -34,6 +34,9 @@ def go_to_pose(reachy: ReachySDK, pose: npt.NDArray[np.float64], prefix: str, me
                 current_joint = np.deg2rad(get_current_joints(reachy, prefix_arm))
                 pose_pollen = reachy_arm.forward_kinematics(ik)
                 compute_metrics(pose, current_joint, prefix_arm, "pollen", np.deg2rad(ik), pose_pollen, velocity = [])
+            
+            for joint, goal_pos in zip(reachy_arm.joints.values(), ik):
+                joint.goal_position = goal_pos
         
 
 

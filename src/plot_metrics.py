@@ -302,8 +302,8 @@ def plot_ecart_pos_rot(path, df, method):
     # Secondary Y-axis for degrees
     ax2.set_ylabel("Rotational Error (deg)", color='black')
     ax2.set_ylim(ax1.get_ylim())  # Ensure same range
-    ax2.set_yticks(np.radians(radian_ticks))
-    ax2.set_yticklabels(radian_ticks)
+    ax2.set_yticks(np.rad2deg(radian_ticks))
+    ax2.set_yticklabels(np.rad2deg(radian_ticks))
     
     ax1.legend(loc="upper left")
     
@@ -423,6 +423,7 @@ def plot_all(method, path):
     
     # Load data from CSV
     df = pd.read_csv(os.path.join(path, csv_filename))
+    # df = pd.read_csv(os.path.join(path, csv_filename), skiprows=range(1, 21))
 
     path_pollen = f"/home/reachy/dev/reachy2_symbolic_ik/src/reachy2_symbolic_ik/csv_files_for_metrics/pollen"
     if os.path.exists(os.path.join(path_pollen, f"metrics_pollen_l.csv")) and os.path.exists(os.path.join(path_pollen, f"metrics_pollen_r.csv")) : 
@@ -430,6 +431,7 @@ def plot_all(method, path):
         csv_filename_pollen = f"metrics_pollen.csv"
         merge_csv_file(path_pollen, "pollen", csv_filename_pollen)
         df_pollen = pd.read_csv(os.path.join(path_pollen, csv_filename_pollen))
+        # df_pollen = pd.read_csv(os.path.join(path, csv_filename), skiprows=range(1, 21))
 
     # Generate and save various plots
     plot_q(path, df, method)
